@@ -1,4 +1,4 @@
-// backend/routes/email.js - SIMPLIFIED VERSION USING MIDDLEWARE
+// backend/routes/email.js - CLEAN VERSION
 const express = require("express");
 const EmailService = require("../services/emailService");
 

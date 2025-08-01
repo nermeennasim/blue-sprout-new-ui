@@ -1,84 +1,28 @@
 import React, { useState } from "react";
 import { InputField } from "./InputField";
 import { FormField } from "./FormField";
+import { useEmailMutation } from "../hooks/useEmailMutation";
 
-interface ContactProps {
+export interface ContactProps {
 	isDark: boolean;
 }
 
-interface FormData {
+export interface ContactFormData {
 	name: string;
 	email: string;
 	phone: string;
 	message: string;
 }
 
-interface ApiResponse {
+export interface ApiResponse {
 	success?: boolean;
 	message?: string;
 	error?: string;
 	id?: string;
 }
 
-// Email API mutation hook
-const useEmailMutation = () => {
-	const [isLoading, setIsLoading] = useState(false);
-	const [error, setError] = useState<string | null>(null);
-	const [data, setData] = useState<ApiResponse | null>(null);
-
-	const mutate = async (formData: FormData): Promise<ApiResponse> => {
-		setIsLoading(true);
-		setError(null);
-		setData(null);
-
-		try {
-			const response = await fetch("http://localhost:3001/api/send-email", {
-				method: "POST",
-				headers: {
-					"Content-Type": "application/json",
-				},
-				body: JSON.stringify(formData),
-			});
-
-			const result: ApiResponse = await response.json();
-
-			if (!response.ok) {
-				throw new Error(
-					result.error || `HTTP error! status: ${response.status}`
-				);
-			}
-
-			setData(result);
-			return result;
-		} catch (err) {
-			const errorMessage =
-				err instanceof Error ? err.message : "Network error occurred";
-			setError(errorMessage);
-			throw new Error(errorMessage);
-		} finally {
-			setIsLoading(false);
-		}
-	};
-
-	const reset = () => {
-		setError(null);
-		setData(null);
-		setIsLoading(false);
-	};
-
-	return {
-		mutate,
-		isLoading,
-		error,
-		data,
-		reset,
-		isSuccess: !!data?.success,
-		isError: !!error,
-	};
-};
-
 export const Contact: React.FC<ContactProps> = ({ isDark }) => {
-	const [formData, setFormData] = useState<FormData>({
+	const [ContactFormData, setContactFormData] = useState<ContactFormData>({
 		name: "",
 		email: "",
 		phone: "",
@@ -92,7 +36,7 @@ export const Contact: React.FC<ContactProps> = ({ isDark }) => {
 		e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
 	) => {
 		const { name, value } = e.target;
-		setFormData((prev) => ({ ...prev, [name]: value }));
+		setContactFormData((prev) => ({ ...prev, [name]: value }));
 
 		// Clear previous errors when user starts typing
 		if (emailMutation.error) {
@@ -104,15 +48,15 @@ export const Contact: React.FC<ContactProps> = ({ isDark }) => {
 		e.preventDefault();
 
 		try {
-			console.log("🚀 Submitting form data:", formData);
+			console.log("🚀 Submitting form data:", ContactFormData);
 
-			const result = await emailMutation.mutate(formData);
+			const result = await emailMutation.mutate(ContactFormData);
 
 			console.log("✅ Email sent successfully:", result);
 
 			// Show confirmation and reset form
 			setShowConfirmation(true);
-			setFormData({
+			setContactFormData({
 				name: "",
 				email: "",
 				phone: "",
@@ -157,9 +101,7 @@ export const Contact: React.FC<ContactProps> = ({ isDark }) => {
 									d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
 								/>
 							</svg>
-							<h2 className="text-3xl font-bold mb-4">
-								🎉 Message Sent Successfully!
-							</h2>
+							<h2 className="text-3xl font-bold mb-4">🎉 Message Sent !</h2>
 							<p
 								className={`text-lg mb-6 ${
 									isDark ? "text-gray-300" : "text-gray-600"
@@ -276,7 +218,7 @@ export const Contact: React.FC<ContactProps> = ({ isDark }) => {
 						<InputField
 							type="text"
 							name="name"
-							value={formData.name}
+							value={ContactFormData.name}
 							onChange={handleChange}
 							placeholder="e.g. First Last"
 							isDark={isDark}
@@ -289,7 +231,7 @@ export const Contact: React.FC<ContactProps> = ({ isDark }) => {
 						<InputField
 							type="email"
 							name="email"
-							value={formData.email}
+							value={ContactFormData.email}
 							onChange={handleChange}
 							placeholder="e.g. abc@example.com"
 							isDark={isDark}
@@ -305,7 +247,7 @@ export const Contact: React.FC<ContactProps> = ({ isDark }) => {
 						<InputField
 							type="tel"
 							name="phone"
-							value={formData.phone}
+							value={ContactFormData.phone}
 							onChange={handleChange}
 							placeholder="e.g. 1112223333"
 							isDark={isDark}
@@ -323,7 +265,7 @@ export const Contact: React.FC<ContactProps> = ({ isDark }) => {
 						<textarea
 							id="message"
 							name="message"
-							value={formData.message}
+							value={ContactFormData.message}
 							onChange={handleChange}
 							minLength={10}
 							maxLength={200}
@@ -342,7 +284,7 @@ export const Contact: React.FC<ContactProps> = ({ isDark }) => {
 							className={`text-right text-sm mt-1 ${
 								isDark ? "text-gray-400" : "text-gray-500"
 							}`}>
-							{formData.message.length}/200 characters
+							{ContactFormData.message.length}/200 characters
 						</div>
 					</FormField>
 

@@ -1,4 +1,4 @@
-// server.js
+// server.js - FINAL WORKING VERSION
 require("dotenv").config();
 const express = require("express");
 const cors = require("cors");
@@ -17,7 +17,7 @@ const corsOptions = {
 		process.env.NODE_ENV === "production"
 			? [process.env.FRONTEND_URL]
 			: [
-					"http://localhost:5173",
+					"http://localhost:5174",
 					"http://localhost:3000",
 					"http://127.0.0.1:5173",
 				],
@@ -63,8 +63,8 @@ app.use((err, req, res, next) => {
 	});
 });
 
-// 404 handler
-app.use("*", (req, res) => {
+// 404 handler - FIXED VERSION (removed the problematic "*")
+app.use((req, res) => {
 	res.status(404).json({
 		error: "Route not found",
 		path: req.originalUrl,

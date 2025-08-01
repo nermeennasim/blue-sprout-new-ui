@@ -17,9 +17,7 @@ const App = () => {
 			<Navbar isDark={isDark} toggleTheme={toggleTheme} />
 			<Hero isDark={isDark} />
 
-			<div className="bg-accent-dark text-white p-4 rounded shadow-glow-orange">
-				This is using your custom Tailwind colors and shadow!
-			</div>
+			<div className="bg-accent-dark text-white p-4 rounded shadow-glow-orange"></div>
 			<Section id="about" className="mb-24 py-20">
 				<h2 className="text-3xl font-bold mb-4">About Us</h2>
 				<p className="max-w-3xl">
