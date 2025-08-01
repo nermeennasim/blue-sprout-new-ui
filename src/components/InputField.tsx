@@ -13,6 +13,7 @@ interface InputFieldProps {
 	inputMode?: React.HTMLAttributes<HTMLInputElement>["inputMode"];
 	maxLength?: number;
 }
+
 export const InputField: React.FC<InputFieldProps> = ({
 	label,
 	type,
@@ -26,15 +27,12 @@ export const InputField: React.FC<InputFieldProps> = ({
 	inputMode = "text",
 	maxLength,
 }) => {
-	const baseClass =
-		"p-3 border rounded-lg w-full bg-gray-50 text-gray-800 dark:bg-gray-700 dark:border-gray-600 dark:text-gray-200";
-
 	return (
 		<div className="flex flex-col gap-2">
 			<label
 				htmlFor={name}
 				className={`font-semibold ${
-					isDark ? "text-gray-500" : "text-gray-800"
+					isDark ? "text-gray-300" : "text-gray-800"
 				}`}>
 				{label}
 			</label>
@@ -46,10 +44,16 @@ export const InputField: React.FC<InputFieldProps> = ({
 				onChange={onChange}
 				required={required}
 				placeholder={placeholder}
-				className={baseClass}
 				pattern={pattern}
 				inputMode={inputMode}
 				maxLength={maxLength}
+				className={`p-3 border rounded-lg w-full transition-colors ${
+					isDark
+						? "bg-gray-700 border-gray-600 text-white placeholder-gray-400 focus:border-orange-500"
+						: "bg-gray-50 border-gray-300 text-gray-900 placeholder-gray-500 focus:border-teal-500"
+				} focus:outline-none focus:ring-2 focus:ring-opacity-20 ${
+					isDark ? "focus:ring-orange-500" : "focus:ring-teal-500"
+				}`}
 			/>
 		</div>
 	);
