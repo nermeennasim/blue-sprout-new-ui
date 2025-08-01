@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # React + TypeScript + Vite
 
 This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
@@ -67,3 +68,7 @@ export default tseslint.config([
   },
 ])
 ```
+=======
+# blue-sprout-agency-2
+This is Business Website of my Own Blue Sprout Agency
+>>>>>>> c5e8a44fbdd2cab2948e6c0cdf19a05adad5fe19
