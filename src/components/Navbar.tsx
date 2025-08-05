@@ -1,4 +1,6 @@
+// components/Navbar.tsx
 import React, { useState } from "react";
+import { Link, useLocation } from "react-router-dom";
 import { Menu, X, Sprout, Sun, Moon } from "lucide-react";
 
 export interface NavbarProps {
@@ -8,14 +10,22 @@ export interface NavbarProps {
 
 export const Navbar: React.FC<NavbarProps> = ({ isDark, toggleTheme }) => {
 	const [isMenuOpen, setIsMenuOpen] = useState<boolean>(false);
+	const location = useLocation();
 
-	const menuItems: { label: string; id: string }[] = [
-		{ label: "About", id: "about" },
-		{ label: "Services", id: "services" },
-		{ label: "Pricing", id: "pricing" },
-		{ label: "Testimonials", id: "testimonials" },
-		{ label: "Contact", id: "contact" },
+	const menuItems: { label: string; path: string }[] = [
+		{ label: "Home", path: "/" },
+		{ label: "About", path: "/about" },
+		{ label: "Services", path: "/services" },
+		{ label: "Pricing", path: "/pricing" },
+		{ label: "Testimonials", path: "/testimonials" },
+		{ label: "Contact", path: "/contact" },
 	];
+
+	const isActive = (path: string) => {
+		if (path === "/" && location.pathname === "/") return true;
+		if (path !== "/" && location.pathname === path) return true;
+		return false;
+	};
 
 	return (
 		<nav
@@ -27,7 +37,7 @@ export const Navbar: React.FC<NavbarProps> = ({ isDark, toggleTheme }) => {
 			<div className="w-full max-w-6xl mx-auto px-6 py-4">
 				<div className="flex items-center justify-between">
 					{/* Logo */}
-					<div className="flex items-center space-x-3">
+					<Link to="/" className="flex items-center space-x-3">
 						<div
 							className={`p-3 rounded-xl transition-all duration-300 hover:scale-110 transform shadow-lg ${
 								isDark
@@ -42,33 +52,41 @@ export const Navbar: React.FC<NavbarProps> = ({ isDark, toggleTheme }) => {
 							}`}>
 							Blue Sprout Agency
 						</h1>
-					</div>
+					</Link>
 
 					{/* Desktop Menu */}
 					<div className="hidden lg:flex items-center space-x-6">
 						{menuItems.map((item, index) =>
 							item.label === "Contact" ? (
-								<a
+								<Link
 									key={index}
-									href={`#${item.id}`}
+									to={item.path}
 									className={`px-4 py-2 rounded-lg font-semibold transition-all duration-300 hover:scale-105 ${
-										isDark
+										isActive(item.path)
+											? isDark
+												? "bg-orange-600 text-white"
+												: "bg-teal-600 text-white"
+											: isDark
 											? "bg-orange-500 text-white hover:bg-orange-600"
 											: "bg-teal-500 text-white hover:bg-teal-600"
 									}`}>
 									{item.label}
-								</a>
+								</Link>
 							) : (
-								<a
+								<Link
 									key={index}
-									href={`#${item.id}`}
+									to={item.path}
 									className={`text-sm font-semibold px-4 py-2 rounded-lg transition-all duration-300 hover:scale-105 transform ${
-										isDark
+										isActive(item.path)
+											? isDark
+												? "text-orange-400 bg-orange-500/20 shadow-md"
+												: "text-teal-600 bg-teal-50 shadow-md"
+											: isDark
 											? "text-gray-300 hover:text-white hover:bg-orange-500/20 hover:shadow-md"
 											: "text-gray-700 hover:text-teal-600 hover:bg-teal-50 hover:shadow-md"
 									}`}>
 									{item.label}
-								</a>
+								</Link>
 							)
 						)}
 
@@ -128,17 +146,21 @@ export const Navbar: React.FC<NavbarProps> = ({ isDark, toggleTheme }) => {
 								: "bg-white/95 border border-gray-200 backdrop-blur-md"
 						}`}>
 						{menuItems.map((item, index) => (
-							<a
+							<Link
 								key={index}
-								href={`#${item.id}`}
+								to={item.path}
 								onClick={() => setIsMenuOpen(false)}
 								className={`block py-3 px-4 text-sm font-medium rounded-lg mb-2 transition-all duration-300 last:mb-0 ${
-									isDark
+									isActive(item.path)
+										? isDark
+											? "text-orange-400 bg-orange-500/20"
+											: "text-teal-600 bg-teal-50"
+										: isDark
 										? "text-gray-300 hover:text-white hover:bg-orange-500/20"
 										: "text-gray-700 hover:text-teal-600 hover:bg-teal-50"
 								}`}>
 								{item.label}
-							</a>
+							</Link>
 						))}
 					</div>
 				)}

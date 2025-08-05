@@ -1,3 +1,5 @@
+// Update your Contact.tsx component
+
 import React, { useState } from "react";
 import { InputField } from "./InputField";
 import { FormField } from "./FormField";
@@ -32,6 +34,20 @@ export const Contact: React.FC<ContactProps> = ({ isDark }) => {
 	const [showConfirmation, setShowConfirmation] = useState(false);
 	const emailMutation = useEmailMutation();
 
+	// Banner control - set to true to show banner and disable form
+	const isFormUnderDevelopment = true;
+
+	// Check if form has required content
+	const isFormValid =
+		ContactFormData.name.trim() !== "" &&
+		ContactFormData.email.trim() !== "" &&
+		ContactFormData.message.trim() !== "" &&
+		ContactFormData.message.length >= 10;
+
+	// Button should be disabled if form is under development OR form is invalid OR currently loading
+	const isButtonDisabled =
+		isFormUnderDevelopment || !isFormValid || emailMutation.isLoading;
+
 	const handleChange = (
 		e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
 	) => {
@@ -46,6 +62,20 @@ export const Contact: React.FC<ContactProps> = ({ isDark }) => {
 
 	const handleSubmit = async (e: React.FormEvent) => {
 		e.preventDefault();
+
+		// Prevent submission if form is under development
+		if (isFormUnderDevelopment) {
+			alert(
+				"🚧 Contact form is under development. Please call us directly at (657) 217-4737"
+			);
+			return;
+		}
+
+		// Prevent submission if form is not valid
+		if (!isFormValid) {
+			alert("Please fill in all required fields with valid information.");
+			return;
+		}
 
 		try {
 			console.log("🚀 Submitting form data:", ContactFormData);
@@ -156,12 +186,23 @@ export const Contact: React.FC<ContactProps> = ({ isDark }) => {
 				isDark ? "bg-gray-900 text-white" : "bg-gray-100 text-gray-800"
 			}`}>
 			<div className="max-w-4xl mx-auto px-4 md:px-8">
+				{/* Development Banner - Show only when under development */}
+				{isFormUnderDevelopment && (
+					<div className="text-center mb-8">
+						<div className="inline-flex items-center px-6 py-3 bg-gradient-to-r from-yellow-500 to-orange-500 text-white rounded-full font-bold shadow-lg text-sm md:text-base mb-6">
+							🚧 Contact Form Under Development - Call Us Directly!
+						</div>
+					</div>
+				)}
+
 				<h2 className="text-3xl font-bold text-center mb-8">Contact Us</h2>
 
 				<div className="text-center mb-8 space-y-3">
 					<p>
 						📞 Call us at{" "}
-						<a href="tel:+16572174737" className="text-blue-500 underline">
+						<a
+							href="tel:+16572174737"
+							className="text-blue-500 underline font-bold text-lg hover:text-blue-600 transition-colors">
 							(657) 217-4737
 						</a>
 					</p>
@@ -169,21 +210,55 @@ export const Contact: React.FC<ContactProps> = ({ isDark }) => {
 						📧 Email:{" "}
 						<a
 							href="mailto:support@bluesproutagency.com"
-							className="text-blue-500 underline">
+							className="text-blue-500 underline font-medium hover:text-blue-600 transition-colors">
 							support@bluesproutagency.com
 						</a>
 					</p>
-					<a
-						href="https://calendly.com/your-calendar-link"
-						target="_blank"
-						rel="noopener noreferrer"
-						className={`inline-block mt-4 px-6 py-3 rounded-lg font-semibold transition-all duration-300 ${
+
+					{/* Calendar Booking Options */}
+					<div className="flex flex-col sm:flex-row gap-4 justify-center items-center mt-6">
+						{/* Option 1: Direct Email Scheduling */}
+						<a
+							href="mailto:support@bluesproutagency.com?subject=Schedule%20Free%20Consultation&body=Hi%20Blue%20Sprout%20Agency,%0A%0AI'd%20like%20to%20schedule%20a%20free%20consultation.%0A%0AMy%20preferred%20times:%0A-%20Monday%20to%20Friday:%20[Your%20preferred%20time]%0A-%20Phone%20number:%20[Your%20phone%20number]%0A-%20Business%20type:%20[Your%20business%20type]%0A%0AThank%20you!"
+							className={`inline-flex items-center px-6 py-3 rounded-lg font-semibold transition-all duration-300 hover:scale-105 shadow-lg ${
+								isDark
+									? "bg-orange-500 text-white hover:bg-orange-600"
+									: "bg-teal-600 text-white hover:bg-teal-700"
+							}`}>
+							📅 Email to Schedule Free Call
+						</a>
+
+						{/* Option 2: SMS Scheduling */}
+						<a
+							href="sms:+16572174737?&body=Hi%20Blue%20Sprout%20Agency!%20I'd%20like%20to%20schedule%20a%20free%20consultation%20for%20my%20business."
+							className={`inline-flex items-center px-6 py-3 rounded-lg font-semibold transition-all duration-300 hover:scale-105 border-2 ${
+								isDark
+									? "border-green-500 text-green-400 hover:bg-green-500 hover:text-white"
+									: "border-green-600 text-green-600 hover:bg-green-600 hover:text-white"
+							}`}>
+							💬 Text to Schedule
+						</a>
+					</div>
+
+					{/* Calendar Integration Note */}
+					<div
+						className={`mt-4 p-4 rounded-lg ${
 							isDark
-								? "bg-orange-500 text-white hover:bg-orange-600"
-								: "bg-teal-600 text-white hover:bg-teal-700"
+								? "bg-blue-900/30 border border-blue-500/30"
+								: "bg-blue-50 border border-blue-200"
 						}`}>
-						📅 Book a Free Call
-					</a>
+						<p
+							className={`text-sm ${
+								isDark ? "text-blue-200" : "text-blue-700"
+							}`}>
+							📋 <strong>Free 30-minute consultation includes:</strong>
+							<br />
+							• Business analysis & digital presence audit
+							<br />
+							• Custom growth strategy recommendations
+							<br />• Pricing & timeline discussion
+						</p>
+					</div>
 				</div>
 
 				{/* API Status Indicator */}
@@ -213,7 +288,22 @@ export const Contact: React.FC<ContactProps> = ({ isDark }) => {
 					onSubmit={handleSubmit}
 					className={`shadow-lg rounded-lg p-8 md:p-12 space-y-6 ${
 						isDark ? "bg-gray-800" : "bg-white"
-					}`}>
+					} ${isFormUnderDevelopment ? "opacity-75" : ""}`}>
+					{/* Form status indicator */}
+					{isFormUnderDevelopment && (
+						<div
+							className={`p-4 rounded-lg border-2 border-dashed ${
+								isDark
+									? "border-yellow-400 bg-yellow-900/20 text-yellow-200"
+									: "border-yellow-500 bg-yellow-50 text-yellow-700"
+							}`}>
+							<p className="text-center font-medium">
+								⚠️ Form is temporarily disabled. Please use the contact
+								information above.
+							</p>
+						</div>
+					)}
+
 					<FormField label="Your Name" htmlFor="name" isDark={isDark}>
 						<InputField
 							type="text"
@@ -291,15 +381,17 @@ export const Contact: React.FC<ContactProps> = ({ isDark }) => {
 					<div className="mx-4 md:mx-8">
 						<button
 							type="submit"
-							disabled={emailMutation.isLoading}
-							className={`w-full py-3 rounded-lg font-bold transition-all duration-300 transform hover:scale-105 ${
-								emailMutation.isLoading
-									? "bg-gray-400 cursor-not-allowed"
+							disabled={isButtonDisabled}
+							className={`w-full py-3 rounded-lg font-bold transition-all duration-300 ${
+								isButtonDisabled
+									? "bg-gray-400 cursor-not-allowed text-gray-600"
 									: isDark
-									? "bg-orange-500 text-white hover:bg-orange-600 hover:shadow-lg"
-									: "bg-teal-600 text-white hover:bg-teal-700 hover:shadow-lg"
+									? "bg-orange-500 text-white hover:bg-orange-600 hover:shadow-lg transform hover:scale-105"
+									: "bg-teal-600 text-white hover:bg-teal-700 hover:shadow-lg transform hover:scale-105"
 							}`}>
-							{emailMutation.isLoading ? (
+							{isFormUnderDevelopment ? (
+								"🚧 Form Under Development"
+							) : emailMutation.isLoading ? (
 								<span className="flex items-center justify-center">
 									<svg
 										className="animate-spin -ml-1 mr-3 h-5 w-5 text-white"
@@ -320,11 +412,25 @@ export const Contact: React.FC<ContactProps> = ({ isDark }) => {
 									</svg>
 									Sending Message...
 								</span>
+							) : !isFormValid ? (
+								"📝 Please Fill Required Fields"
 							) : (
 								"📨 Send Message"
 							)}
 						</button>
 					</div>
+
+					{/* Form validation hints */}
+					{!isFormUnderDevelopment && !isFormValid && (
+						<div className="text-center space-y-2">
+							<p
+								className={`text-sm ${
+									isDark ? "text-gray-400" : "text-gray-500"
+								}`}>
+								Required: Name, Email, Message (minimum 10 characters)
+							</p>
+						</div>
+					)}
 
 					{/* Mutation Status Indicators */}
 					<div className="text-center space-y-2">
