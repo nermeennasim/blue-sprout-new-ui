@@ -1,6 +1,5 @@
-// Update your Contact.tsx component
-
-import React, { useState } from "react";
+// Clean minimalist Contact.tsx component
+import React, { useState, useEffect } from "react";
 import { InputField } from "./InputField";
 import { FormField } from "./FormField";
 import { useEmailMutation } from "../hooks/useEmailMutation";
@@ -9,6 +8,12 @@ export interface ContactProps {
 	isDark: boolean;
 }
 
+// Add Calendly type declaration
+declare global {
+	interface Window {
+		Calendly: any;
+	}
+}
 export interface ContactFormData {
 	name: string;
 	email: string;
@@ -16,33 +21,68 @@ export interface ContactFormData {
 	message: string;
 }
 
-export interface ApiResponse {
-	success?: boolean;
-	message?: string;
-	error?: string;
-	id?: string;
-}
-
 export const Contact: React.FC<ContactProps> = ({ isDark }) => {
-	const [ContactFormData, setContactFormData] = useState<ContactFormData>({
+	const [contactFormData, setContactFormData] = useState<ContactFormData>({
 		name: "",
 		email: "",
 		phone: "",
 		message: "",
 	});
-
 	const [showConfirmation, setShowConfirmation] = useState(false);
 	const emailMutation = useEmailMutation();
 
-	// Banner control - set to true to show banner and disable form
+	// Form is under development - set to true to disable form
 	const isFormUnderDevelopment = true;
 
-	// Check if form has required content
+	// Load Calendly popup widget
+	useEffect(() => {
+		// Load CSS
+		const link = document.createElement("link");
+		link.href = "https://assets.calendly.com/assets/external/widget.css";
+		link.rel = "stylesheet";
+		document.head.appendChild(link);
+
+		// Load Script
+		const script = document.createElement("script");
+		script.src = "https://assets.calendly.com/assets/external/widget.js";
+		script.async = true;
+		script.onload = () => {
+			// Initialize badge widget after script loads
+			if (window.Calendly) {
+				window.Calendly.initBadgeWidget({
+					url: "https://calendly.com/bluesproutagency/30min",
+					text: "📅 Schedule Free Call",
+					color: isDark ? "#f97316" : "#0d9488", // Orange for dark, teal for light
+					textColor: "#ffffff",
+					branding: false, // Remove "powered by Calendly"
+				});
+			}
+		};
+		document.head.appendChild(script);
+
+		return () => {
+			// Cleanup
+			const existingScript = document.querySelector(
+				'script[src="https://assets.calendly.com/assets/external/widget.js"]'
+			);
+			const existingLink = document.querySelector(
+				'link[href="https://assets.calendly.com/assets/external/widget.css"]'
+			);
+			if (existingScript) document.head.removeChild(existingScript);
+			if (existingLink) document.head.removeChild(existingLink);
+
+			// Remove badge widget
+			const badgeWidget = document.querySelector(".calendly-badge-widget");
+			if (badgeWidget) badgeWidget.remove();
+		};
+	}, [isDark]);
+
+	// Form validation
 	const isFormValid =
-		ContactFormData.name.trim() !== "" &&
-		ContactFormData.email.trim() !== "" &&
-		ContactFormData.message.trim() !== "" &&
-		ContactFormData.message.length >= 10;
+		contactFormData.name.trim() !== "" &&
+		contactFormData.email.trim() !== "" &&
+		contactFormData.message.trim() !== "" &&
+		contactFormData.message.length >= 10;
 
 	// Button should be disabled if form is under development OR form is invalid OR currently loading
 	const isButtonDisabled =
@@ -53,8 +93,6 @@ export const Contact: React.FC<ContactProps> = ({ isDark }) => {
 	) => {
 		const { name, value } = e.target;
 		setContactFormData((prev) => ({ ...prev, [name]: value }));
-
-		// Clear previous errors when user starts typing
 		if (emailMutation.error) {
 			emailMutation.reset();
 		}
@@ -66,111 +104,47 @@ export const Contact: React.FC<ContactProps> = ({ isDark }) => {
 		// Prevent submission if form is under development
 		if (isFormUnderDevelopment) {
 			alert(
-				"🚧 Contact form is under development. Please call us directly at (657) 217-4737"
+				"🚧 Contact form is under development. Please use the Schedule Free Call button or call us directly at (657) 217-4737"
 			);
 			return;
 		}
 
-		// Prevent submission if form is not valid
 		if (!isFormValid) {
-			alert("Please fill in all required fields with valid information.");
+			alert("Please fill in all required fields.");
 			return;
 		}
 
 		try {
-			console.log("🚀 Submitting form data:", ContactFormData);
-
-			const result = await emailMutation.mutate(ContactFormData);
-
-			console.log("✅ Email sent successfully:", result);
-
-			// Show confirmation and reset form
+			await emailMutation.mutate(contactFormData);
 			setShowConfirmation(true);
-			setContactFormData({
-				name: "",
-				email: "",
-				phone: "",
-				message: "",
-			});
+			setContactFormData({ name: "", email: "", phone: "", message: "" });
 		} catch (error) {
-			console.error("❌ Email submission failed:", error);
-			// Error is already handled by the mutation hook
+			console.error("Form submission failed:", error);
 		}
 	};
 
-	const resetForm = () => {
-		setShowConfirmation(false);
-		emailMutation.reset();
-	};
-
-	// Success confirmation screen
+	// Success screen
 	if (showConfirmation) {
 		return (
 			<section
-				id="contact"
-				className={`py-20 mb-24 px-6 transition-all duration-300 ${
-					isDark ? "bg-gray-900 text-white" : "bg-gray-100 text-gray-800"
-				}`}>
-				<div className="max-w-4xl mx-auto px-4 md:px-8">
+				className={`py-20 px-6 ${isDark ? "bg-gray-900" : "bg-gray-50"}`}>
+				<div className="max-w-2xl mx-auto text-center">
 					<div
-						className={`text-center p-8 rounded-lg ${
-							isDark
-								? "bg-gray-800 border border-gray-700"
-								: "bg-white border border-gray-200"
+						className={`p-8 rounded-xl ${
+							isDark ? "bg-gray-800" : "bg-white"
 						} shadow-lg`}>
-						<div className="mb-6">
-							<svg
-								className="w-20 h-20 text-green-500 mx-auto mb-4"
-								fill="none"
-								stroke="currentColor"
-								viewBox="0 0 24 24">
-								<path
-									strokeLinecap="round"
-									strokeLinejoin="round"
-									strokeWidth={2}
-									d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
-								/>
-							</svg>
-							<h2 className="text-3xl font-bold mb-4">🎉 Message Sent !</h2>
-							<p
-								className={`text-lg mb-6 ${
-									isDark ? "text-gray-300" : "text-gray-600"
-								}`}>
-								Thank you for reaching out! We've received your message and will
-								get back to you within 24 hours.
-							</p>
-
-							{emailMutation.data?.id && (
-								<p
-									className={`text-sm mb-4 ${
-										isDark ? "text-gray-400" : "text-gray-500"
-									}`}>
-									Reference ID: {emailMutation.data.id}
-								</p>
-							)}
-
-							<div className="space-y-4">
-								<p className={isDark ? "text-gray-300" : "text-gray-600"}>
-									📧 Check your email for a confirmation message
-								</p>
-								<p className={isDark ? "text-gray-300" : "text-gray-600"}>
-									Need immediate assistance? Call us at{" "}
-									<a
-										href="tel:+16572174737"
-										className="text-blue-500 underline font-medium">
-										(657) 217-4737
-									</a>
-								</p>
-							</div>
-						</div>
-
+						<div className="text-6xl mb-4">✅</div>
+						<h2 className="text-2xl font-bold mb-4">Message Sent!</h2>
+						<p className={`mb-6 ${isDark ? "text-gray-300" : "text-gray-600"}`}>
+							We'll get back to you within 24 hours.
+						</p>
 						<button
-							onClick={resetForm}
-							className={`px-8 py-3 rounded-lg font-semibold transition-all duration-300 ${
+							onClick={() => setShowConfirmation(false)}
+							className={`px-6 py-3 rounded-lg font-semibold ${
 								isDark
-									? "bg-orange-500 hover:bg-orange-600 text-white"
-									: "bg-teal-600 hover:bg-teal-700 text-white"
-							} transform hover:scale-105`}>
+									? "bg-orange-500 hover:bg-orange-600"
+									: "bg-teal-600 hover:bg-teal-700"
+							} text-white transition-colors`}>
 							Send Another Message
 						</button>
 					</div>
@@ -180,222 +154,189 @@ export const Contact: React.FC<ContactProps> = ({ isDark }) => {
 	}
 
 	return (
-		<section
-			id="contact"
-			className={`py-20 mb-24 px-6 transition-all duration-300 ${
-				isDark ? "bg-gray-900 text-white" : "bg-gray-100 text-gray-800"
-			}`}>
-			<div className="max-w-4xl mx-auto px-4 md:px-8">
-				{/* Development Banner - Show only when under development */}
+		<section className={`py-20 px-6 ${isDark ? "bg-gray-900" : "bg-gray-50"}`}>
+			<div className="max-w-4xl mx-auto">
+				{/* Development Banner - Show when form is under development */}
 				{isFormUnderDevelopment && (
 					<div className="text-center mb-8">
-						<div className="inline-flex items-center px-6 py-3 bg-gradient-to-r from-yellow-500 to-orange-500 text-white rounded-full font-bold shadow-lg text-sm md:text-base mb-6">
-							🚧 Contact Form Under Development - Call Us Directly!
+						<div className="inline-flex items-center px-6 py-3 bg-gradient-to-r from-yellow-500 to-orange-500 text-white rounded-full font-bold shadow-lg text-sm md:text-base mb-4">
+							🚧 Contact Form Under Development - Use Schedule Button or Call
+							Direct!
 						</div>
 					</div>
 				)}
 
-				<h2 className="text-3xl font-bold text-center mb-8">Contact Us</h2>
-
-				<div className="text-center mb-8 space-y-3">
-					<p>
-						📞 Call us at{" "}
-						<a
-							href="tel:+16572174737"
-							className="text-blue-500 underline font-bold text-lg hover:text-blue-600 transition-colors">
-							(657) 217-4737
-						</a>
-					</p>
-					<p>
-						📧 Email:{" "}
-						<a
-							href="mailto:support@bluesproutagency.com"
-							className="text-blue-500 underline font-medium hover:text-blue-600 transition-colors">
-							support@bluesproutagency.com
-						</a>
+				{/* Header */}
+				<div className="text-center mb-12">
+					<h2
+						className={`text-3xl font-bold mb-4 ${
+							isDark ? "text-white" : "text-gray-800"
+						}`}>
+						Get In Touch
+					</h2>
+					<p
+						className={`text-lg mb-6 ${
+							isDark ? "text-gray-300" : "text-gray-600"
+						}`}>
+						Ready to grow your business? Send us a message or schedule a free
+						consultation.
 					</p>
 
-					{/* Calendar Booking Options */}
-					<div className="flex flex-col sm:flex-row gap-4 justify-center items-center mt-6">
-						{/* Option 1: Direct Email Scheduling */}
-						<a
-							href="mailto:support@bluesproutagency.com?subject=Schedule%20Free%20Consultation&body=Hi%20Blue%20Sprout%20Agency,%0A%0AI'd%20like%20to%20schedule%20a%20free%20consultation.%0A%0AMy%20preferred%20times:%0A-%20Monday%20to%20Friday:%20[Your%20preferred%20time]%0A-%20Phone%20number:%20[Your%20phone%20number]%0A-%20Business%20type:%20[Your%20business%20type]%0A%0AThank%20you!"
-							className={`inline-flex items-center px-6 py-3 rounded-lg font-semibold transition-all duration-300 hover:scale-105 shadow-lg ${
-								isDark
-									? "bg-orange-500 text-white hover:bg-orange-600"
-									: "bg-teal-600 text-white hover:bg-teal-700"
-							}`}>
-							📅 Email to Schedule Free Call
-						</a>
-
-						{/* Option 2: SMS Scheduling */}
-						<a
-							href="sms:+16572174737?&body=Hi%20Blue%20Sprout%20Agency!%20I'd%20like%20to%20schedule%20a%20free%20consultation%20for%20my%20business."
-							className={`inline-flex items-center px-6 py-3 rounded-lg font-semibold transition-all duration-300 hover:scale-105 border-2 ${
-								isDark
-									? "border-green-500 text-green-400 hover:bg-green-500 hover:text-white"
-									: "border-green-600 text-green-600 hover:bg-green-600 hover:text-white"
-							}`}>
-							💬 Text to Schedule
-						</a>
+					{/* Quick Contact Info */}
+					<div className="space-y-2 mb-8">
+						<p className={isDark ? "text-gray-300" : "text-gray-600"}>
+							📞{" "}
+							<a
+								href="tel:+16572174737"
+								className="text-blue-500 hover:text-blue-600 font-semibold">
+								(657) 217-4737
+							</a>
+						</p>
+						<p className={isDark ? "text-gray-300" : "text-gray-600"}>
+							📧{" "}
+							<a
+								href="mailto:support@bluesproutagency.com"
+								className="text-blue-500 hover:text-blue-600">
+								support@bluesproutagency.com
+							</a>
+						</p>
 					</div>
 
-					{/* Calendar Integration Note */}
-					<div
-						className={`mt-4 p-4 rounded-lg ${
-							isDark
-								? "bg-blue-900/30 border border-blue-500/30"
-								: "bg-blue-50 border border-blue-200"
-						}`}>
+					{/* Popup Schedule Button */}
+					<div className="mb-8">
 						<p
-							className={`text-sm ${
-								isDark ? "text-blue-200" : "text-blue-700"
+							className={`text-sm mb-3 ${
+								isDark ? "text-gray-400" : "text-gray-500"
 							}`}>
-							📋 <strong>Free 30-minute consultation includes:</strong>
-							<br />
-							• Business analysis & digital presence audit
-							<br />
-							• Custom growth strategy recommendations
-							<br />• Pricing & timeline discussion
+							💡 <strong>Tip:</strong> Look for the floating "Schedule Free
+							Call" button to book instantly!
 						</p>
 					</div>
 				</div>
-
-				{/* API Status Indicator */}
-				{emailMutation.isError && (
-					<div className="mb-6 p-4 bg-red-100 border border-red-400 text-red-700 rounded-lg">
-						<div className="flex items-center">
-							<svg
-								className="w-5 h-5 mr-2"
-								fill="currentColor"
-								viewBox="0 0 20 20">
-								<path
-									fillRule="evenodd"
-									d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z"
-									clipRule="evenodd"
-								/>
-							</svg>
-							<div>
-								<p className="font-medium">Email Failed to Send</p>
-								<p className="text-sm">{emailMutation.error}</p>
-							</div>
-						</div>
-					</div>
-				)}
-
-				{/* Form Start */}
-				<form
-					onSubmit={handleSubmit}
-					className={`shadow-lg rounded-lg p-8 md:p-12 space-y-6 ${
+				{/* Contact Form */}
+				<div
+					className={`rounded-xl shadow-lg p-8 max-w-2xl mx-auto ${
 						isDark ? "bg-gray-800" : "bg-white"
 					} ${isFormUnderDevelopment ? "opacity-75" : ""}`}>
+					<h3
+						className={`text-xl font-semibold mb-6 text-center ${
+							isDark ? "text-white" : "text-gray-800"
+						}`}>
+						Send Us a Message
+					</h3>
+
 					{/* Form status indicator */}
 					{isFormUnderDevelopment && (
 						<div
-							className={`p-4 rounded-lg border-2 border-dashed ${
+							className={`p-4 rounded-lg border-2 border-dashed mb-6 ${
 								isDark
 									? "border-yellow-400 bg-yellow-900/20 text-yellow-200"
 									: "border-yellow-500 bg-yellow-50 text-yellow-700"
 							}`}>
 							<p className="text-center font-medium">
-								⚠️ Form is temporarily disabled. Please use the contact
-								information above.
+								⚠️ Form is temporarily disabled while we set up our email
+								service.
+								<br />
+								<span className="text-sm">
+									Please use the floating "Schedule Free Call" button or contact
+									us directly!
+								</span>
 							</p>
 						</div>
 					)}
 
-					<FormField label="Your Name" htmlFor="name" isDark={isDark}>
-						<InputField
-							type="text"
-							name="name"
-							value={ContactFormData.name}
-							onChange={handleChange}
-							placeholder="e.g. First Last"
-							isDark={isDark}
-							label=""
-							required
-						/>
-					</FormField>
-
-					<FormField label="Your Email" htmlFor="email" isDark={isDark}>
-						<InputField
-							type="email"
-							name="email"
-							value={ContactFormData.email}
-							onChange={handleChange}
-							placeholder="e.g. abc@example.com"
-							isDark={isDark}
-							label=""
-							required
-						/>
-					</FormField>
-
-					<FormField
-						label="Phone Number (Optional)"
-						htmlFor="phone"
-						isDark={isDark}>
-						<InputField
-							type="tel"
-							name="phone"
-							value={ContactFormData.phone}
-							onChange={handleChange}
-							placeholder="e.g. 1112223333"
-							isDark={isDark}
-							pattern="[0-9]{10}"
-							inputMode="numeric"
-							maxLength={10}
-							label=""
-						/>
-					</FormField>
-
-					<FormField
-						label="Your Message (10-200 characters)"
-						htmlFor="message"
-						isDark={isDark}>
-						<textarea
-							id="message"
-							name="message"
-							value={ContactFormData.message}
-							onChange={handleChange}
-							minLength={10}
-							maxLength={200}
-							required
-							rows={4}
-							placeholder="Tell us about your project or ask us a question..."
-							className={`p-3 border rounded-lg w-full resize-none transition-colors ${
-								isDark
-									? "bg-gray-700 border-gray-600 text-white focus:border-orange-500"
-									: "bg-gray-50 border-gray-300 text-gray-900 focus:border-teal-500"
-							} focus:outline-none focus:ring-2 focus:ring-opacity-20 ${
-								isDark ? "focus:ring-orange-500" : "focus:ring-teal-500"
-							}`}
-						/>
-						<div
-							className={`text-right text-sm mt-1 ${
-								isDark ? "text-gray-400" : "text-gray-500"
-							}`}>
-							{ContactFormData.message.length}/200 characters
+					{/* Error Display */}
+					{emailMutation.isError && (
+						<div className="mb-6 p-4 bg-red-100 border border-red-400 text-red-700 rounded-lg">
+							<p className="font-medium">Message failed to send</p>
+							<p className="text-sm">{emailMutation.error}</p>
 						</div>
-					</FormField>
+					)}
 
-					<div className="mx-4 md:mx-8">
+					<form onSubmit={handleSubmit} className="space-y-6">
+						<div className="grid md:grid-cols-2 gap-6">
+							<FormField label="Name" htmlFor="name" isDark={isDark}>
+								<InputField
+									type="text"
+									name="name"
+									value={contactFormData.name}
+									onChange={handleChange}
+									placeholder="Your name"
+									isDark={isDark}
+									label=""
+									required
+								/>
+							</FormField>
+
+							<FormField label="Email" htmlFor="email" isDark={isDark}>
+								<InputField
+									type="email"
+									name="email"
+									value={contactFormData.email}
+									onChange={handleChange}
+									placeholder="your@email.com"
+									isDark={isDark}
+									label=""
+									required
+								/>
+							</FormField>
+						</div>
+
+						<FormField label="Phone (Optional)" htmlFor="phone" isDark={isDark}>
+							<InputField
+								type="tel"
+								name="phone"
+								value={contactFormData.phone}
+								onChange={handleChange}
+								placeholder="(555) 123-4567"
+								isDark={isDark}
+								label=""
+							/>
+						</FormField>
+
+						<FormField label="Message" htmlFor="message" isDark={isDark}>
+							<textarea
+								id="message"
+								name="message"
+								value={contactFormData.message}
+								onChange={handleChange}
+								minLength={10}
+								maxLength={500}
+								required
+								rows={4}
+								placeholder="Tell us about your business and how we can help..."
+								className={`p-3 border rounded-lg w-full resize-none transition-colors ${
+									isDark
+										? "bg-gray-700 border-gray-600 text-white focus:border-orange-500"
+										: "bg-gray-50 border-gray-300 text-gray-900 focus:border-teal-500"
+								} focus:outline-none focus:ring-2 focus:ring-opacity-20 ${
+									isDark ? "focus:ring-orange-500" : "focus:ring-teal-500"
+								}`}
+							/>
+							<div
+								className={`text-right text-sm mt-1 ${
+									isDark ? "text-gray-400" : "text-gray-500"
+								}`}>
+								{contactFormData.message.length}/500
+							</div>
+						</FormField>
+
 						<button
 							type="submit"
 							disabled={isButtonDisabled}
-							className={`w-full py-3 rounded-lg font-bold transition-all duration-300 ${
+							className={`w-full py-3 rounded-lg font-semibold transition-all duration-300 ${
 								isButtonDisabled
 									? "bg-gray-400 cursor-not-allowed text-gray-600"
 									: isDark
-									? "bg-orange-500 text-white hover:bg-orange-600 hover:shadow-lg transform hover:scale-105"
-									: "bg-teal-600 text-white hover:bg-teal-700 hover:shadow-lg transform hover:scale-105"
-							}`}>
+									? "bg-orange-500 text-white hover:bg-orange-600"
+									: "bg-teal-600 text-white hover:bg-teal-700"
+							} transform hover:scale-105`}>
 							{isFormUnderDevelopment ? (
 								"🚧 Form Under Development"
 							) : emailMutation.isLoading ? (
 								<span className="flex items-center justify-center">
 									<svg
-										className="animate-spin -ml-1 mr-3 h-5 w-5 text-white"
-										xmlns="http://www.w3.org/2000/svg"
+										className="animate-spin -ml-1 mr-3 h-5 w-5"
 										fill="none"
 										viewBox="0 0 24 24">
 										<circle
@@ -408,42 +349,30 @@ export const Contact: React.FC<ContactProps> = ({ isDark }) => {
 										<path
 											className="opacity-75"
 											fill="currentColor"
-											d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+											d="M4 12a8 8 0 018-8V0C5.373 0 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
 									</svg>
-									Sending Message...
+									Sending...
 								</span>
 							) : !isFormValid ? (
 								"📝 Please Fill Required Fields"
 							) : (
-								"📨 Send Message"
+								"Send Message"
 							)}
 						</button>
-					</div>
 
-					{/* Form validation hints */}
-					{!isFormUnderDevelopment && !isFormValid && (
-						<div className="text-center space-y-2">
-							<p
-								className={`text-sm ${
-									isDark ? "text-gray-400" : "text-gray-500"
-								}`}>
-								Required: Name, Email, Message (minimum 10 characters)
-							</p>
-						</div>
-					)}
-
-					{/* Mutation Status Indicators */}
-					<div className="text-center space-y-2">
-						{emailMutation.isLoading && (
-							<p
-								className={`text-sm ${
-									isDark ? "text-gray-300" : "text-gray-600"
-								}`}>
-								🚀 Sending your message via email API...
-							</p>
+						{/* Form validation hints */}
+						{!isFormUnderDevelopment && !isFormValid && (
+							<div className="text-center mt-4">
+								<p
+									className={`text-sm ${
+										isDark ? "text-gray-400" : "text-gray-500"
+									}`}>
+									Required: Name, Email, Message (minimum 10 characters)
+								</p>
+							</div>
 						)}
-					</div>
-				</form>
+					</form>
+				</div>
 			</div>
 		</section>
 	);

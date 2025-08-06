@@ -9,7 +9,11 @@ import {
 	Target,
 	TrendingUp,
 } from "lucide-react";
-// Import animations CSS directly in this component
+
+// Import your logo files - REMOVED, not needed in Hero
+// import sprtLogoSvg from '../assets/sprout.svg';
+// import sprtLogo192 from '../assets/sprout-logo-192.png';
+// import sprtLogo512 from '../assets/sprout-logo-512.png';
 
 export interface HeroProps {
 	isDark: boolean;
@@ -71,21 +75,13 @@ export const Hero: React.FC<HeroProps> = ({ isDark }) => {
 
 				{/* Main Hero Content */}
 				<div className="text-center mb-16">
-					{/* Logo Placeholder with Animation */}
+					{/* Brand Tagline - No Logo Needed Here */}
 					<div className="mb-8">
-						<div
-							className={`mx-auto w-32 h-32 rounded-full flex items-center justify-center transition-all duration-1000 hover:scale-110 hover:rotate-12 ${
-								isDark
-									? "bg-gradient-to-br from-orange-500 to-red-500 shadow-orange-500/40"
-									: "bg-gradient-to-br from-teal-500 to-blue-600 shadow-teal-500/40"
-							} shadow-2xl animate-pulse`}>
-							<span className="text-4xl font-bold text-white">BS</span>
-						</div>
 						<p
-							className={`mt-4 text-sm font-medium ${
+							className={`text-lg font-medium ${
 								isDark ? "text-gray-400" : "text-gray-500"
 							}`}>
-							{/* <img src="src/assets/logo.png" /> */}
+							Your Growth Partner in Chino, CA
 						</p>
 					</div>
 

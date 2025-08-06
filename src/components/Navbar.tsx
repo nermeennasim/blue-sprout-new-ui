@@ -1,7 +1,10 @@
 // components/Navbar.tsx
 import React, { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
-import { Menu, X, Sprout, Sun, Moon } from "lucide-react";
+import { Menu, X, Sun, Moon } from "lucide-react";
+
+// Import your logo files
+import sprtLogo192 from "../assets/sprout-logo-192.png";
 
 export interface NavbarProps {
 	isDark: boolean;
@@ -36,20 +39,39 @@ export const Navbar: React.FC<NavbarProps> = ({ isDark, toggleTheme }) => {
 			} shadow-xl border-b-2 transition-all duration-300`}>
 			<div className="w-full max-w-6xl mx-auto px-6 py-4">
 				<div className="flex items-center justify-between">
-					{/* Logo */}
-					<Link to="/" className="flex items-center space-x-3">
-						<div
-							className={`p-3 rounded-xl transition-all duration-300 hover:scale-110 transform shadow-lg ${
-								isDark
-									? "bg-gradient-to-br from-orange-500 to-orange-600 shadow-orange-500/30"
-									: "bg-gradient-to-br from-teal-500 to-blue-600 shadow-teal-500/30"
-							}`}>
-							<Sprout className="w-6 h-6 text-white" />
+					{/* Logo with Real Image - Bigger Size & Rounded */}
+					<Link to="/" className="flex items-center space-x-3 group">
+						<div className="relative">
+							{/* Use your real logo - Made bigger (48x48px) and rounded */}
+							<img
+								src={sprtLogo192}
+								alt="Blue Sprout Agency Logo"
+								className="w-12 h-12 rounded-full transition-all duration-300 group-hover:scale-125 drop-shadow-lg object-cover"
+								style={{
+									filter: isDark
+										? "drop-shadow(0 4px 12px rgba(249, 115, 22, 0.4)) drop-shadow(0 0 20px rgba(249, 115, 22, 0.2))"
+										: "drop-shadow(0 4px 12px rgba(20, 184, 166, 0.4)) drop-shadow(0 0 20px rgba(20, 184, 166, 0.2))",
+								}}
+							/>
+
+							{/* Enhanced glow effect on hover - also rounded */}
+							<div
+								className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-all duration-300 blur-lg -z-10 rounded-full"
+								style={{
+									background: isDark
+										? "radial-gradient(circle, rgba(249, 115, 22, 0.4) 0%, rgba(249, 115, 22, 0.1) 50%, transparent 70%)"
+										: "radial-gradient(circle, rgba(20, 184, 166, 0.4) 0%, rgba(20, 184, 166, 0.1) 50%, transparent 70%)",
+									transform: "scale(1.5)",
+								}}></div>
+
+							{/* Color overlay on hover for extra glow - also rounded */}
+							<div
+								className={`absolute inset-0 opacity-0 group-hover:opacity-30 transition-opacity duration-300 rounded-full ${
+									isDark ? "bg-orange-400" : "bg-teal-400"
+								} mix-blend-overlay`}></div>
 						</div>
-						<h1
-							className={`text-2xl font-bold transition-colors duration-300 ${
-								isDark ? "text-white" : "text-gray-800"
-							}`}>
+
+						<h1 className="text-2xl font-bold transition-colors duration-300 bg-gradient-to-r from-blue-600 via-blue-500 to-blue-700 bg-clip-text text-transparent">
 							Blue Sprout Agency
 						</h1>
 					</Link>
