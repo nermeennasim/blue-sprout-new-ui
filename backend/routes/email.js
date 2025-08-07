@@ -1,64 +1,112 @@
-// backend/routes/email.js - CLEAN VERSION
+// backend/routes/email.js
 const express = require("express");
-const EmailService = require("../services/emailService");
+const { Resend } = require("resend");
 
 const router = express.Router();
-const emailService = new EmailService();
+const resend = new Resend(process.env.RESEND_API_KEY);
 
-// POST /api/send-email - Main endpoint for contact form
 router.post("/send-email", async (req, res) => {
-	try {
-		// Use the email service middleware to handle everything
-		const result = await emailService.sendContactFormEmail(req.body);
+	console.log("📧 Email send request received");
+	console.log("Request body:", req.body);
 
-		if (result.success) {
-			res.status(200).json({
-				success: true,
-				message: result.message,
-				id: result.id,
-			});
-		} else {
-			res.status(400).json({
-				error: result.error,
+	try {
+		const { name, email, message, subject } = req.body;
+
+		// Validate required fields
+		if (!name || !email || !message) {
+			console.log("❌ Missing required fields");
+			return res.status(400).json({
+				success: false,
+				error: "Missing required fields: name, email, and message are required",
 			});
 		}
-	} catch (error) {
-		console.error("💥 Route error:", error);
-		res.status(500).json({
-			error: "Internal server error. Please try again later.",
-		});
-	}
-});
 
-// GET /api/email-status - Check if email service is configured
-router.get("/email-status", async (req, res) => {
-	try {
-		const status = await emailService.testConfiguration();
+		// Email validation
+		const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+		if (!emailRegex.test(email)) {
+			console.log("❌ Invalid email format");
+			return res.status(400).json({
+				success: false,
+				error: "Invalid email format",
+			});
+		}
+
+		console.log("✅ Validation passed, sending email...");
+
+		const emailData = {
+			from: process.env.FROM_EMAIL || "noreply@bluesproutagency.com",
+			to: [process.env.TO_EMAIL || "support@bluesproutagency.com"],
+			subject: subject || `New Contact Form Submission from ${name}`,
+			html: `
+        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+          <h2 style="color: #333;">New Contact Form Submission</h2>
+          
+          <div style="background-color: #f5f5f5; padding: 20px; border-radius: 5px; margin: 20px 0;">
+            <h3 style="margin-top: 0; color: #555;">Contact Details:</h3>
+            <p><strong>Name:</strong> ${name}</p>
+            <p><strong>Email:</strong> ${email}</p>
+            <p><strong>Subject:</strong> ${subject || "No subject provided"}</p>
+          </div>
+          
+          <div style="background-color: #ffffff; padding: 20px; border-left: 4px solid #007bff; margin: 20px 0;">
+            <h3 style="margin-top: 0; color: #555;">Message:</h3>
+            <p style="line-height: 1.6; color: #333;">${message.replace(
+							/\n/g,
+							"<br>"
+						)}</p>
+          </div>
+          
+          <div style="margin-top: 30px; padding: 15px; background-color: #e9f4ff; border-radius: 5px;">
+            <p style="margin: 0; font-size: 14px; color: #666;">
+              <strong>Reply to this email to respond directly to ${name} at ${email}</strong>
+            </p>
+          </div>
+          
+          <hr style="margin: 30px 0; border: none; border-top: 1px solid #eee;">
+          
+          <p style="font-size: 12px; color: #888; text-align: center;">
+            This email was sent from your Blue Sprout Agency contact form.<br>
+            Timestamp: ${new Date().toLocaleString()}
+          </p>
+        </div>
+      `,
+			reply_to: email, // This allows you to reply directly to the person who submitted the form
+		};
+
+		console.log("Sending email with data:", {
+			from: emailData.from,
+			to: emailData.to,
+			subject: emailData.subject,
+			reply_to: emailData.reply_to,
+		});
+
+		const result = await resend.emails.send(emailData);
+
+		console.log("✅ Email sent successfully:", result);
 
 		res.status(200).json({
-			message: "Email service status",
-			timestamp: new Date().toISOString(),
-			configured: status.configured,
-			missingVariables: status.missingVariables,
-			hasApiKey: status.hasApiKey,
+			success: true,
+			message: "Email sent successfully",
+			id: result.id,
 		});
 	} catch (error) {
+		console.error("❌ Email sending failed:", error);
+
 		res.status(500).json({
-			error: "Failed to check email service status",
-			details: error.message,
+			success: false,
+			error: "Failed to send email",
+			details:
+				process.env.NODE_ENV === "development" ? error.message : undefined,
 		});
 	}
 });
 
-// GET /api/test-email - Simple test endpoint
-router.get("/test-email", (req, res) => {
+// Test endpoint
+router.get("/test", (req, res) => {
 	res.json({
-		message: "Email API is working!",
+		message: "Email routes are working",
 		timestamp: new Date().toISOString(),
-		endpoints: {
-			sendEmail: "POST /api/send-email",
-			emailStatus: "GET /api/email-status",
-		},
+		resendConfigured: !!process.env.RESEND_API_KEY,
 	});
 });
 
