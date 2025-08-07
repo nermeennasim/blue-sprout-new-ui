@@ -1,9 +1,0 @@
-{
-  "redirects": [
-    {
-      "source": "https://bluesproutagency.com/:path*",
-      "destination": "https://www.bluesproutagency.com/:path*",
-      "permanent": true
-    }
-  ]
-}
