@@ -268,7 +268,7 @@ class EmailService {
 
 			// Log email configuration being used
 			console.log(`⚙️ [${requestId}] Email configuration:`, {
-				fromEmail: this.fromEmail,
+				fromEmail: this.email,
 				toEmail: this.toEmail,
 				replyToEmail: email, // Customer's email for reply-to
 				businessName: this.businessName,
@@ -280,7 +280,7 @@ class EmailService {
 			// Send notification email to business - WITH REPLY-TO CUSTOMER EMAIL
 			const { data: businessEmailData, error: businessEmailError } =
 				await this.resend.emails.send({
-					from: this.fromEmail, // Your verified domain email (noreply@bluesproutagency.com)
+					from: this.email, // Your verified domain email (user input)
 					to: [this.toEmail], // Your business email (support@bluesproutagency.com)
 					reply_to: email, // 🔥 CUSTOMER'S EMAIL - When you hit Reply, goes to customer!
 					subject: `🌱 New Contact: ${sanitizedName} - ${email}`, // Include customer email in subject
