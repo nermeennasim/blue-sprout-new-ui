@@ -1,0 +1,29 @@
+
+Hostname	Record type	Priority	Value
+@	MX	10	mx1.privateemail.com
+@	MX	10	mx2.privateemail.com
+@	TXT		v=spf1 include:spf.privateemail.com ~all
+
+
+
+-----------------
+
+# Check if MX records are visible
+nslookup -type=MX bluesproutagency.com
+
+# Should eventually show:
+# mx1.privateemail.com
+# mx2.privateemail.com
+
+
+
+# Check MX records
+nslookup -type=MX bluesproutagency.com
+
+# Check SPF record  
+nslookup -type=TXT bluesproutagency.com
+
+# Online verification tools:
+# - mxtoolbox.com/mx/bluesproutagency.com
+# - mxtoolbox.com/spf/bluesproutagency.com
+# - whatsmydns.net

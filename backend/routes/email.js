@@ -1,65 +1,50 @@
-// backend/routes/email.js - CLEAN VERSION
+// backend/routes/email.js - CORRECT VERSION
 const express = require("express");
 const EmailService = require("../services/emailService");
 
 const router = express.Router();
 const emailService = new EmailService();
 
-// POST /api/send-email - Main endpoint for contact form
 router.post("/send-email", async (req, res) => {
+	console.log("📧 Email send request received");
+	console.log("Request body:", req.body);
+
 	try {
-		// Use the email service middleware to handle everything
+		// Use the EmailService to send emails
 		const result = await emailService.sendContactFormEmail(req.body);
 
 		if (result.success) {
-			res.status(200).json({
-				success: true,
-				message: result.message,
-				id: result.id,
-			});
+			res.status(200).json(result);
 		} else {
-			res.status(400).json({
-				error: result.error,
-			});
+			res.status(400).json(result);
 		}
 	} catch (error) {
-		console.error("💥 Route error:", error);
+		console.error("❌ Email route error:", error);
+
 		res.status(500).json({
-			error: "Internal server error. Please try again later.",
+			success: false,
+			error: "Failed to send emails. Please try again.",
+			details:
+				process.env.NODE_ENV === "development" ? error.message : undefined,
 		});
 	}
 });
 
-// GET /api/email-status - Check if email service is configured
-router.get("/email-status", async (req, res) => {
+// Test endpoint
+router.get("/test", async (req, res) => {
 	try {
-		const status = await emailService.testConfiguration();
-
-		res.status(200).json({
-			message: "Email service status",
+		const config = await emailService.testConfiguration();
+		res.json({
+			message: "Email routes are working",
 			timestamp: new Date().toISOString(),
-			configured: status.configured,
-			missingVariables: status.missingVariables,
-			hasApiKey: status.hasApiKey,
+			configuration: config,
 		});
 	} catch (error) {
 		res.status(500).json({
-			error: "Failed to check email service status",
-			details: error.message,
+			message: "Email service test failed",
+			error: error.message,
 		});
 	}
-});
-
-// GET /api/test-email - Simple test endpoint
-router.get("/test-email", (req, res) => {
-	res.json({
-		message: "Email API is working!",
-		timestamp: new Date().toISOString(),
-		endpoints: {
-			sendEmail: "POST /api/send-email",
-			emailStatus: "GET /api/email-status",
-		},
-	});
 });
 
 module.exports = router;

@@ -1,93 +1,85 @@
-// server.js - FINAL WORKING VERSION
-require("dotenv").config();
-const express = require("express");
-const cors = require("cors");
-const emailRoutes = require("./routes/email");
+// backend/server.js
+require('dotenv').config();
+
+console.log('🔧 Environment variables loaded:');
+console.log('- NODE_ENV:', process.env.NODE_ENV || 'development');
+console.log('- PORT:', process.env.PORT || 3001);
+console.log('- RESEND_API_KEY exists:', !!process.env.RESEND_API_KEY);
+console.log('- FROM_EMAIL:', process.env.FROM_EMAIL);
+console.log('- TO_EMAIL:', process.env.TO_EMAIL);
+
+const express = require('express');
+const cors = require('cors');
+const emailRoutes = require('./routes/email');
 
 const app = express();
 const PORT = process.env.PORT || 3001;
 
-// Middleware
-app.use(express.json({ limit: "10mb" }));
-app.use(express.urlencoded({ extended: true }));
+// CORS Configuration
+app.use(cors({
+  origin: [
+    'http://localhost:5173', // Vite dev server
+    'http://localhost:3000', // Alternative React dev server
+    'https://bluesproutagency.com', // Production domain
+    'https://www.bluesproutagency.com' // Production www domain
+  ],
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
+  credentials: true
+}));
 
-// CORS configuration
-const corsOptions = {
-	origin:
-		process.env.NODE_ENV === "production"
-			? [process.env.FRONTEND_URL]
-			: [
-					"http://localhost:5174",
-					"http://localhost:3000",
-					"http://127.0.0.1:5173",
-				],
-	credentials: true,
-	optionsSuccessStatus: 200,
-};
+// Body parsing middleware
+app.use(express.json({ limit: '10mb' }));
+app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
-app.use(cors(corsOptions));
+// Request logging
+app.use((req, res, next) => {
+  console.log(`${new Date().toISOString()} - ${req.method} ${req.path}`);
+  if (req.body && Object.keys(req.body).length > 0) {
+    console.log('Request body:', req.body);
+  }
+  next();
+});
 
 // Routes
-app.use("/api", emailRoutes);
+app.use('/api', emailRoutes);
 
 // Health check endpoint
-app.get("/health", (req, res) => {
-	res.status(200).json({
-		status: "OK",
-		timestamp: new Date().toISOString(),
-		environment: process.env.NODE_ENV || "development",
-	});
+app.get('/health', (req, res) => {
+  res.json({ 
+    status: 'OK', 
+    timestamp: new Date().toISOString(),
+    port: PORT,
+    envLoaded: !!process.env.RESEND_API_KEY,
+    fromEmail: process.env.FROM_EMAIL,
+    toEmail: process.env.TO_EMAIL
+  });
 });
 
-// Root endpoint
-app.get("/", (req, res) => {
-	res.json({
-		message: "Blue Sprout Agency API Server",
-		version: "1.0.0",
-		endpoints: {
-			health: "/health",
-			sendEmail: "POST /api/send-email",
-		},
-	});
+// 404 handler
+app.use('*', (req, res) => {
+  res.status(404).json({ 
+    error: 'Route not found',
+    path: req.path,
+    method: req.method
+  });
 });
 
-// Error handling middleware
-app.use((err, req, res, next) => {
-	console.error("Error:", err.stack);
-	res.status(500).json({
-		error: "Something went wrong!",
-		message:
-			process.env.NODE_ENV === "development"
-				? err.message
-				: "Internal server error",
-	});
-});
-
-// 404 handler - FIXED VERSION (removed the problematic "*")
-app.use((req, res) => {
-	res.status(404).json({
-		error: "Route not found",
-		path: req.originalUrl,
-	});
+// Error handler
+app.use((error, req, res, next) => {
+  console.error('Server Error:', error);
+  res.status(500).json({ 
+    error: 'Internal server error',
+    message: process.env.NODE_ENV === 'development' ? error.message : 'Something went wrong'
+  });
 });
 
 // Start server
 app.listen(PORT, () => {
-	console.log(`🚀 Server running on port ${PORT}`);
-	console.log(
-		`📧 Email API available at http://localhost:${PORT}/api/send-email`
-	);
-	console.log(`🏥 Health check at http://localhost:${PORT}/health`);
-	console.log(`🌍 Environment: ${process.env.NODE_ENV || "development"}`);
-
-	// Check if Resend API key is configured
-	if (!process.env.RESEND_API_KEY) {
-		console.warn(
-			"⚠️  WARNING: RESEND_API_KEY not found in environment variables"
-		);
-	} else {
-		console.log("✅ Resend API key configured");
-	}
+  console.log(`🚀 Backend server running on http://localhost:${PORT}`);
+  console.log(`📧 Email API endpoint: http://localhost:${PORT}/api/send-email`);
+  console.log(`🔍 Health check: http://localhost:${PORT}/health`);
+  console.log(`⚙️ Environment: ${process.env.NODE_ENV || 'development'}`);
 });
 
 module.exports = app;

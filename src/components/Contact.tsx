@@ -1,4 +1,4 @@
-// Clean minimalist Contact.tsx component
+// components/Contact.tsx - Complete Original Contact Form
 import React, { useState, useEffect } from "react";
 import { InputField } from "./InputField";
 import { FormField } from "./FormField";
@@ -14,11 +14,19 @@ declare global {
 		Calendly: any;
 	}
 }
+
 export interface ContactFormData {
 	name: string;
 	email: string;
 	phone: string;
 	message: string;
+}
+
+export interface ApiResponse {
+	success?: boolean;
+	message?: string;
+	error?: string;
+	id?: string;
 }
 
 export const Contact: React.FC<ContactProps> = ({ isDark }) => {
@@ -31,8 +39,8 @@ export const Contact: React.FC<ContactProps> = ({ isDark }) => {
 	const [showConfirmation, setShowConfirmation] = useState(false);
 	const emailMutation = useEmailMutation();
 
-	// Form is under development - set to true to disable form
-	const isFormUnderDevelopment = true;
+	// Form is under development - set to FALSE to enable form
+	const isFormUnderDevelopment = false; // ✅ Set to false to enable
 
 	// Load Calendly popup widget
 	useEffect(() => {
@@ -115,15 +123,30 @@ export const Contact: React.FC<ContactProps> = ({ isDark }) => {
 		}
 
 		try {
-			await emailMutation.mutate(contactFormData);
+			console.log("🚀 Submitting form data:", contactFormData);
+			const result = await emailMutation.mutate(contactFormData);
+			console.log("✅ Email sent successfully:", result);
+
+			// Show confirmation and reset form
 			setShowConfirmation(true);
-			setContactFormData({ name: "", email: "", phone: "", message: "" });
+			setContactFormData({
+				name: "",
+				email: "",
+				phone: "",
+				message: "",
+			});
 		} catch (error) {
-			console.error("Form submission failed:", error);
+			console.error("❌ Email submission failed:", error);
+			// Error is already handled by the mutation hook
 		}
 	};
 
-	// Success screen
+	const resetForm = () => {
+		setShowConfirmation(false);
+		emailMutation.reset();
+	};
+
+	// Success confirmation screen
 	if (showConfirmation) {
 		return (
 			<section
@@ -138,8 +161,32 @@ export const Contact: React.FC<ContactProps> = ({ isDark }) => {
 						<p className={`mb-6 ${isDark ? "text-gray-300" : "text-gray-600"}`}>
 							We'll get back to you within 24 hours.
 						</p>
+
+						{emailMutation.data?.id && (
+							<p
+								className={`text-sm mb-4 ${
+									isDark ? "text-gray-400" : "text-gray-500"
+								}`}>
+								Reference ID: {emailMutation.data.id}
+							</p>
+						)}
+
+						<div className="space-y-4 mb-6">
+							<p className={isDark ? "text-gray-300" : "text-gray-600"}>
+								📧 Check your email for a confirmation message
+							</p>
+							<p className={isDark ? "text-gray-300" : "text-gray-600"}>
+								Need immediate assistance? Call us at{" "}
+								<a
+									href="tel:+16572174737"
+									className="text-blue-500 underline font-medium">
+									(657) 217-4737
+								</a>
+							</p>
+						</div>
+
 						<button
-							onClick={() => setShowConfirmation(false)}
+							onClick={resetForm}
 							className={`px-6 py-3 rounded-lg font-semibold ${
 								isDark
 									? "bg-orange-500 hover:bg-orange-600"
@@ -213,6 +260,7 @@ export const Contact: React.FC<ContactProps> = ({ isDark }) => {
 						</p>
 					</div>
 				</div>
+
 				{/* Contact Form */}
 				<div
 					className={`rounded-xl shadow-lg p-8 max-w-2xl mx-auto ${
@@ -349,7 +397,7 @@ export const Contact: React.FC<ContactProps> = ({ isDark }) => {
 										<path
 											className="opacity-75"
 											fill="currentColor"
-											d="M4 12a8 8 0 018-8V0C5.373 0 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+											d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
 									</svg>
 									Sending...
 								</span>
@@ -371,6 +419,18 @@ export const Contact: React.FC<ContactProps> = ({ isDark }) => {
 								</p>
 							</div>
 						)}
+
+						{/* Mutation Status Indicators */}
+						<div className="text-center space-y-2">
+							{emailMutation.isLoading && (
+								<p
+									className={`text-sm ${
+										isDark ? "text-gray-300" : "text-gray-600"
+									}`}>
+									🚀 Sending your message via email API...
+								</p>
+							)}
+						</div>
 					</form>
 				</div>
 			</div>

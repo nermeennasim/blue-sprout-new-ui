@@ -1,449 +1,223 @@
-// backend/services/emailService.js
-// This is your email middleware/service file
-
+// backend/services/emailService.js - COMPLETE WORKING VERSION
 const { Resend } = require("resend");
 
 class EmailService {
-	constructor() {
-		console.log("🚀 Initializing EmailService...");
+  constructor() {
+    console.log("🚀 Initializing EmailService...");
+    
+    this.resend = new Resend(process.env.RESEND_API_KEY);
+    this.businessEmail = "support@bluesproutagency.com"; // Your verified email
+    this.businessName = "Blue Sprout Agency";
+    
+    console.log("✅ EmailService initialized:", {
+      hasApiKey: !!process.env.RESEND_API_KEY,
+      businessEmail: this.businessEmail,
+      businessName: this.businessName
+    });
+  }
 
-		this.resend = new Resend(process.env.RESEND_API_KEY);
-		this.fromEmail = process.env.FROM_EMAIL;
-		this.toEmail = process.env.TO_EMAIL;
-		this.replyEmail = process.env.REPLY_EMAIL;
-		this.businessName = process.env.BUSINESS_NAME || "Blue Sprout Agency";
+  // Validate email format
+  isValidEmail(email) {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(email);
+  }
 
-		console.log("⚙️ EmailService configuration loaded:", {
-			hasApiKey: !!process.env.RESEND_API_KEY,
-			fromEmail: this.fromEmail,
-			toEmail: this.toEmail,
-			replyEmail: this.replyEmail,
-			businessName: this.businessName,
-			timestamp: new Date().toISOString(),
-		});
+  // Sanitize input to prevent XSS
+  sanitizeInput(input) {
+    if (typeof input !== "string") return "";
+    return input
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;")
+      .replace(/'/g, "&#x27;");
+  }
 
-		// Warn about missing critical configuration
-		if (!process.env.RESEND_API_KEY) {
-			console.error(
-				"⚠️ CRITICAL: RESEND_API_KEY not found in environment variables!"
-			);
-		}
-		if (!this.fromEmail || !this.toEmail || !this.replyEmail) {
-			console.warn("⚠️ WARNING: Some email addresses not configured:", {
-				missingFromEmail: !this.fromEmail,
-				missingToEmail: !this.toEmail,
-				missingReplyEmail: !this.replyEmail,
-			});
-		}
-
-		console.log("✅ EmailService initialized successfully");
-	}
-
-	// Validate email format
-	isValidEmail(email) {
-		const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-		return emailRegex.test(email);
-	}
-
-	// Sanitize input to prevent XSS
-	sanitizeInput(input) {
-		if (typeof input !== "string") return "";
-		return input
-			.replace(/</g, "&lt;")
-			.replace(/>/g, "&gt;")
-			.replace(/"/g, "&quot;")
-			.replace(/'/g, "&#x27;")
-			.replace(/\//g, "&#x2F;");
-	}
-
-	// Validate form data
-	validateFormData(data) {
-		console.log("🔍 Starting form validation for data:", {
-			hasName: !!data.name,
-			hasEmail: !!data.email,
-			hasMessage: !!data.message,
-			nameLength: data.name?.length,
-			emailFormat: this.isValidEmail(data.email),
-			messageLength: data.message?.length,
-		});
-
-		const { name, email, message } = data;
-		const errors = [];
-
-		if (!name || name.trim().length < 2) {
-			errors.push("Name must be at least 2 characters long");
-			console.warn("❌ Validation failed: Invalid name", {
-				name: name?.substring(0, 10),
-			});
-		}
-
-		if (!email || !this.isValidEmail(email)) {
-			errors.push("Please provide a valid email address");
-			console.warn("❌ Validation failed: Invalid email", {
-				email: email?.substring(0, 20),
-			});
-		}
-
-		if (!message || message.trim().length < 10) {
-			errors.push("Message must be at least 10 characters long");
-			console.warn("❌ Validation failed: Message too short", {
-				messageLength: message?.length,
-			});
-		}
-
-		if (message && message.length > 5000) {
-			errors.push("Message is too long. Please keep it under 5000 characters");
-			console.warn("❌ Validation failed: Message too long", {
-				messageLength: message?.length,
-			});
-		}
-
-		const validationResult = {
-			isValid: errors.length === 0,
-			errors,
-		};
-
-		console.log("✅ Form validation completed:", {
-			isValid: validationResult.isValid,
-			errorCount: errors.length,
-			errors: errors,
-		});
-
-		return validationResult;
-	}
-
-	// Generate business notification email HTML
-	generateBusinessEmailHTML(sanitizedName, email, sanitizedMessage) {
-		return `
-      <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; max-width: 600px; margin: 0 auto; background-color: #f8fafc;">
-        <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 30px; text-align: center;">
-          <h1 style="color: white; margin: 0; font-size: 28px; font-weight: 600;">🌱 ${this.businessName}</h1>
-          <p style="color: #e2e8f0; margin: 10px 0 0 0; font-size: 16px;">New Contact Form Submission</p>
-        </div>
-        
-        <div style="background-color: white; padding: 40px; margin: 0;">
-          <div style="background-color: #f1f5f9; padding: 25px; border-radius: 12px; border-left: 4px solid #3b82f6;">
-            <h2 style="color: #1e293b; margin: 0 0 20px 0; font-size: 20px;">Contact Details</h2>
-            
-            <div style="margin-bottom: 15px;">
-              <strong style="color: #475569; display: inline-block; width: 80px;">Name:</strong>
-              <span style="color: #1e293b; font-size: 16px;">${sanitizedName}</span>
-            </div>
-            
-            <div style="margin-bottom: 20px;">
-              <strong style="color: #475569; display: inline-block; width: 80px;">Email:</strong>
-              <a href="mailto:${email}" style="color: #3b82f6; text-decoration: none; font-size: 16px;">${email}</a>
-            </div>
-            
-            <div>
-              <strong style="color: #475569; display: block; margin-bottom: 10px;">Message:</strong>
-              <div style="background-color: white; padding: 20px; border-radius: 8px; border: 1px solid #e2e8f0; line-height: 1.6; color: #1e293b;">
-                ${sanitizedMessage.replace(/\n/g, "<br>")}
-              </div>
-            </div>
+  // Generate business notification email HTML
+  generateBusinessEmailHTML(name, email, message, phone, subject) {
+    return `
+      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; background-color: #f9f9f9; padding: 20px;">
+        <div style="background-color: white; padding: 30px; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1);">
+          <h2 style="color: #333; border-bottom: 3px solid #007bff; padding-bottom: 10px;">New Contact Form Submission</h2>
+          
+          <div style="background-color: #f8f9fa; padding: 20px; border-radius: 8px; margin: 20px 0;">
+            <h3 style="margin-top: 0; color: #555;">Contact Details:</h3>
+            <p><strong>Name:</strong> ${name}</p>
+            <p><strong>Email:</strong> <a href="mailto:${email}" style="color: #007bff;">${email}</a></p>
+            <p><strong>Phone:</strong> ${phone !== "Not provided" ? `<a href="tel:${phone}" style="color: #007bff;">${phone}</a>` : phone}</p>
+            <p><strong>Subject:</strong> ${subject}</p>
           </div>
           
-          <div style="margin-top: 30px; text-align: center;">
-            <a href="mailto:${email}" style="background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%); color: white; padding: 12px 30px; border-radius: 6px; text-decoration: none; font-weight: 500; display: inline-block;">
-              Reply to ${sanitizedName}
-            </a>
+          <div style="background-color: #ffffff; padding: 20px; border-left: 4px solid #28a745; margin: 20px 0; border-radius: 5px;">
+            <h3 style="margin-top: 0; color: #555;">Message:</h3>
+            <p style="line-height: 1.6; color: #333; font-size: 16px;">${message.replace(/\n/g, '<br>')}</p>
           </div>
-        </div>
-        
-        <div style="background-color: #f1f5f9; padding: 20px; text-align: center; color: #64748b; font-size: 14px;">
-          <p style="margin: 0;">This message was sent through your website contact form</p>
-          <p style="margin: 5px 0 0 0;">Received: ${new Date().toLocaleString()}</p>
-        </div>
-      </div>
-    `;
-	}
-
-	// Generate user confirmation email HTML
-	generateConfirmationEmailHTML(sanitizedName, sanitizedMessage) {
-		return `
-      <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; max-width: 600px; margin: 0 auto; background-color: #f8fafc;">
-        <div style="background: linear-gradient(135deg, #10b981 0%, #059669 100%); padding: 30px; text-align: center;">
-          <h1 style="color: white; margin: 0; font-size: 28px; font-weight: 600;">🌱 ${this.businessName}</h1>
-          <p style="color: #d1fae5; margin: 10px 0 0 0; font-size: 16px;">Thank you for reaching out!</p>
-        </div>
-        
-        <div style="background-color: white; padding: 40px;">
-          <h2 style="color: #1e293b; margin: 0 0 20px 0; font-size: 24px;">Hi ${sanitizedName}! 👋</h2>
           
-          <p style="color: #475569; font-size: 16px; line-height: 1.6; margin-bottom: 25px;">
-            Thank you for contacting us! We've received your message and our team will get back to you within 24 hours.
-          </p>
-          
-          <div style="background-color: #f0f9ff; padding: 20px; border-radius: 8px; border-left: 4px solid #0ea5e9; margin: 25px 0;">
-            <p style="color: #0c4a6e; margin: 0; font-weight: 500;">Your message:</p>
-            <p style="color: #0369a1; margin: 10px 0 0 0; font-style: italic; line-height: 1.5;">
-              "${sanitizedMessage}"
+          <div style="background-color: #e7f3ff; padding: 15px; border-radius: 8px; text-align: center;">
+            <p style="margin: 0; color: #0056b3; font-weight: bold;">
+              Click "Reply" to respond directly to ${name}
             </p>
           </div>
           
-          <div style="background-color: #f8fafc; padding: 20px; border-radius: 8px; margin: 25px 0;">
-            <h3 style="color: #1e293b; margin: 0 0 15px 0; font-size: 18px;">What happens next?</h3>
-            <ul style="color: #475569; margin: 0; padding-left: 20px; line-height: 1.6;">
-              <li>Our team will review your message</li>
-              <li>We'll respond within 24 hours (usually much sooner!)</li>
-              <li>We'll discuss how we can help grow your business</li>
-            </ul>
-          </div>
+          <hr style="margin: 30px 0; border: none; border-top: 1px solid #eee;">
           
-          <p style="color: #475569; font-size: 16px; line-height: 1.6; margin-top: 30px;">
-            Best regards,<br>
-            <strong style="color: #1e293b;">The ${this.businessName} Team</strong>
+          <p style="font-size: 12px; color: #888; text-align: center;">
+            Received: ${new Date().toLocaleString()}<br>
+            ${this.businessName} Contact Form
           </p>
-        </div>
-        
-        <div style="background-color: #f1f5f9; padding: 20px; text-align: center; color: #64748b; font-size: 14px;">
-          <p style="margin: 0;">This is an automated confirmation email</p>
-          <p style="margin: 5px 0 0 0;">Please don't reply to this email</p>
         </div>
       </div>
     `;
-	}
+  }
 
-	// Main method to send contact form emails
-	async sendContactFormEmail(formData) {
-		const requestId = `req_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
-		const startTime = Date.now();
+  // Generate customer confirmation email HTML
+  generateCustomerEmailHTML(name, message) {
+    return `
+      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; background-color: #ffffff;">
+        <div style="padding: 40px 30px;">
+          <h2 style="color: #333333; margin-bottom: 20px;">Thank You, ${name}!</h2>
+          
+          <p style="font-size: 16px; color: #333333; line-height: 1.6; margin-bottom: 20px;">
+            Thank you for reaching out to ${this.businessName}. We have received your message and our team will get back to you within 24 hours.
+          </p>
+          
+          <div style="background-color: #f8f9fa; padding: 20px; border-radius: 5px; margin: 20px 0;">
+            <h3 style="margin-top: 0; color: #555555; font-size: 16px;">Your Message:</h3>
+            <p style="color: #666666; font-style: italic; line-height: 1.5; margin: 0;">
+              "${message}"
+            </p>
+          </div>
+          
+          <div style="margin: 30px 0;">
+            <h3 style="color: #333333; font-size: 16px;">What happens next?</h3>
+            <ul style="color: #333333; line-height: 1.6; padding-left: 20px;">
+              <li>Our team will review your message</li>
+              <li>We will respond within 24 hours</li>
+              <li>We will discuss how we can help your business</li>
+            </ul>
+          </div>
+          
+          <div style="text-align: center; margin: 30px 0;">
+            <p style="color: #333; font-size: 16px;">
+              <strong>Need immediate assistance?</strong><br>
+              <a href="mailto:${this.businessEmail}" style="color: #007bff;">${this.businessEmail}</a>
+            </p>
+          </div>
+          
+          <div style="border-top: 1px solid #eeeeee; padding-top: 20px; margin-top: 30px;">
+            <p style="color: #666666; font-size: 14px; margin: 0;">
+              Best regards,<br>
+              The ${this.businessName} Team<br>
+              <a href="https://bluesproutagency.com" style="color: #007bff;">bluesproutagency.com</a>
+            </p>
+          </div>
+        </div>
+      </div>
+    `;
+  }
 
-		try {
-			console.log(`🚀 [${requestId}] Starting email processing...`);
-			console.log(`📧 [${requestId}] Processing email request:`, {
-				name: formData.name,
-				email: formData.email,
-				phone: formData.phone,
-				messageLength: formData.message?.length,
-				timestamp: new Date().toISOString(),
-			});
+  // Main method to send contact form emails
+  async sendContactFormEmail(formData) {
+    try {
+      console.log('📧 Processing contact form submission...');
+      
+      const { name, email, message, phone, subject } = formData;
 
-			// Validate form data
-			console.log(`🔍 [${requestId}] Validating form data...`);
-			const validation = this.validateFormData(formData);
-			if (!validation.isValid) {
-				console.warn(
-					`❌ [${requestId}] Form validation failed:`,
-					validation.errors
-				);
-				return {
-					success: false,
-					error: validation.errors.join(", "),
-				};
-			}
-			console.log(`✅ [${requestId}] Form validation passed`);
+      // Basic validation
+      if (!name || !email || !message) {
+        return {
+          success: false,
+          error: "Missing required fields: name, email, and message are required"
+        };
+      }
 
-			const { name, email, message } = formData;
+      if (!this.isValidEmail(email)) {
+        return {
+          success: false,
+          error: "Invalid email format"
+        };
+      }
 
-			// Sanitize inputs
-			console.log(`🧹 [${requestId}] Sanitizing input data...`);
-			const sanitizedName = this.sanitizeInput(name);
-			const sanitizedMessage = this.sanitizeInput(message);
-			console.log(`✅ [${requestId}] Input sanitization completed`);
+      // Sanitize inputs
+      const sanitizedName = this.sanitizeInput(name);
+      const sanitizedMessage = this.sanitizeInput(message);
+      const sanitizedPhone = this.sanitizeInput(phone || "Not provided");
+      const sanitizedSubject = this.sanitizeInput(subject || "No subject");
 
-			// Log email configuration being used
-			console.log(`⚙️ [${requestId}] Email configuration:`, {
-				fromEmail: this.fromEmail,
-				toEmail: this.toEmail,
-				replyEmail: this.replyEmail,
-				businessName: this.businessName,
-			});
+      console.log('✅ Validation passed, sending emails...');
 
-			console.log(`📤 [${requestId}] Sending business notification email...`);
-			const businessEmailStart = Date.now();
+      // EMAIL 1: Send notification to business
+      const businessEmailData = {
+        from: this.businessEmail,
+		//to: 'fahad.m.nasim@gmail.com',
+        to: email,
+        //reply_to: email, // Customer's email for easy replies
+        reply_to: 'nimmi24.1990@gmail.com',
+		subject: `New Contact Form Submission from ${sanitizedName}`,
+        html: this.generateBusinessEmailHTML(sanitizedName, email, sanitizedMessage, sanitizedPhone, sanitizedSubject)
+      };
 
-			// Send notification email to business
-			const { data: businessEmailData, error: businessEmailError } =
-				await this.resend.emails.send({
-					from: this.fromEmail,
-					to: [this.toEmail],
-					subject: `🌱 New Contact Form Message from ${sanitizedName}`,
-					html: this.generateBusinessEmailHTML(
-						sanitizedName,
-						email,
-						sanitizedMessage
-					),
-				});
+      console.log('📤 Sending business notification...');
+      const businessResult = await this.resend.emails.send(businessEmailData);
 
-			const businessEmailDuration = Date.now() - businessEmailStart;
+      if (businessResult.error) {
+        console.error('❌ Business email failed:', businessResult.error);
+        return {
+          success: false,
+          error: "Failed to send notification email"
+        };
+      }
 
-			if (businessEmailError) {
-				console.error(
-					`❌ [${requestId}] Business email failed after ${businessEmailDuration}ms:`,
-					{
-						error: businessEmailError,
-						errorType: typeof businessEmailError,
-						errorDetails: JSON.stringify(businessEmailError, null, 2),
-					}
-				);
-				return {
-					success: false,
-					error: "Failed to send email. Please try again later.",
-				};
-			}
+      console.log('✅ Business notification sent:', businessResult.data?.id);
 
-			console.log(
-				`✅ [${requestId}] Business email sent successfully in ${businessEmailDuration}ms:`,
-				{
-					emailId: businessEmailData?.id,
-					to: this.toEmail,
-					from: this.fromEmail,
-				}
-			);
+      // EMAIL 2: Send confirmation to customer
+      const customerEmailData = {
+        from: this.businessEmail,
+        to: [email],
+        reply_to: this.businessEmail,
+        subject: `Thank you for contacting ${this.businessName}`,
+        html: this.generateCustomerEmailHTML(sanitizedName, sanitizedMessage)
+      };
 
-			// Send confirmation email to user
-			try {
-				console.log(`📤 [${requestId}] Sending confirmation email to user...`);
-				const confirmationEmailStart = Date.now();
+      console.log('📤 Sending customer confirmation...');
+      const customerResult = await this.resend.emails.send(customerEmailData);
 
-				const { data: confirmationData, error: confirmationError } =
-					await this.resend.emails.send({
-						from: this.replyEmail,
-						to: [email],
-						subject: `🌱 Thank you for contacting ${this.businessName}!`,
-						html: this.generateConfirmationEmailHTML(
-							sanitizedName,
-							sanitizedMessage
-						),
-					});
+      if (customerResult.error) {
+        console.warn('⚠️ Customer confirmation failed:', customerResult.error);
+        // Don't fail the request if confirmation fails
+      } else {
+        console.log('✅ Customer confirmation sent:', customerResult.data?.id);
+      }
 
-				const confirmationEmailDuration = Date.now() - confirmationEmailStart;
+      return {
+        success: true,
+        message: "Emails sent successfully!",
+        businessEmailId: businessResult.data?.id,
+        customerEmailId: customerResult.data?.id || null
+      };
 
-				if (confirmationError) {
-					console.warn(
-						`⚠️ [${requestId}] Confirmation email failed after ${confirmationEmailDuration}ms:`,
-						{
-							error: confirmationError,
-							userEmail: email,
-							fromEmail: this.replyEmail,
-						}
-					);
-				} else {
-					console.log(
-						`✅ [${requestId}] Confirmation email sent successfully in ${confirmationEmailDuration}ms:`,
-						{
-							emailId: confirmationData?.id,
-							to: email,
-							from: this.replyEmail,
-						}
-					);
-				}
-			} catch (confirmationErr) {
-				console.warn(`⚠️ [${requestId}] Confirmation email exception:`, {
-					error: confirmationErr.message,
-					stack: confirmationErr.stack,
-					userEmail: email,
-				});
-				// Continue - main email was sent successfully
-			}
+    } catch (error) {
+      console.error('❌ EmailService error:', error);
+      return {
+        success: false,
+        error: "Internal server error. Please try again later."
+      };
+    }
+  }
 
-			const totalDuration = Date.now() - startTime;
-			console.log(
-				`🎉 [${requestId}] Email processing completed successfully in ${totalDuration}ms:`,
-				{
-					businessEmailId: businessEmailData?.id,
-					totalDuration: `${totalDuration}ms`,
-					timestamp: new Date().toISOString(),
-				}
-			);
+  // Test configuration
+  async testConfiguration() {
+    console.log("🔧 Testing email service configuration...");
+    
+    const result = {
+      configured: !!process.env.RESEND_API_KEY,
+      hasApiKey: !!process.env.RESEND_API_KEY,
+      businessEmail: this.businessEmail,
+      businessName: this.businessName
+    };
 
-			return {
-				success: true,
-				message: "Email sent successfully!",
-				id: businessEmailData?.id,
-			};
-		} catch (error) {
-			const totalDuration = Date.now() - startTime;
-			console.error(
-				`💥 [${requestId}] Email service error after ${totalDuration}ms:`,
-				{
-					error: error.message,
-					stack: error.stack,
-					formData: {
-						name: formData.name,
-						email: formData.email,
-						messageLength: formData.message?.length,
-					},
-					emailConfig: {
-						hasApiKey: !!process.env.RESEND_API_KEY,
-						fromEmail: this.fromEmail,
-						toEmail: this.toEmail,
-					},
-					timestamp: new Date().toISOString(),
-				}
-			);
-
-			return {
-				success: false,
-				error: "Internal server error. Please try again later.",
-			};
-		}
-	}
-
-	// Test method to check if service is configured properly
-	async testConfiguration() {
-		console.log("🔧 Testing email service configuration...");
-
-		const missingVars = [];
-
-		console.log("🔍 Checking environment variables:");
-
-		if (!process.env.RESEND_API_KEY) {
-			missingVars.push("RESEND_API_KEY");
-			console.error("❌ Missing RESEND_API_KEY");
-		} else {
-			console.log("✅ RESEND_API_KEY is set");
-		}
-
-		if (!this.fromEmail) {
-			missingVars.push("FROM_EMAIL");
-			console.error("❌ Missing FROM_EMAIL");
-		} else {
-			console.log("✅ FROM_EMAIL is set:", this.fromEmail);
-		}
-
-		if (!this.toEmail) {
-			missingVars.push("TO_EMAIL");
-			console.error("❌ Missing TO_EMAIL");
-		} else {
-			console.log("✅ TO_EMAIL is set:", this.toEmail);
-		}
-
-		if (!this.replyEmail) {
-			missingVars.push("REPLY_EMAIL");
-			console.error("❌ Missing REPLY_EMAIL");
-		} else {
-			console.log("✅ REPLY_EMAIL is set:", this.replyEmail);
-		}
-
-		console.log("🔧 Additional configuration:");
-		console.log("- Business Name:", this.businessName);
-		console.log(
-			"- Resend Client:",
-			this.resend ? "Initialized" : "Not initialized"
-		);
-
-		const result = {
-			configured: missingVars.length === 0,
-			missingVariables: missingVars,
-			hasApiKey: !!process.env.RESEND_API_KEY,
-			configuration: {
-				fromEmail: this.fromEmail,
-				toEmail: this.toEmail,
-				replyEmail: this.replyEmail,
-				businessName: this.businessName,
-			},
-		};
-
-		console.log("🎯 Configuration test result:", {
-			configured: result.configured,
-			missingVars: missingVars.length,
-			timestamp: new Date().toISOString(),
-		});
-
-		return result;
-	}
+    console.log("📊 Configuration result:", result);
+    return result;
+  }
 }
 
 module.exports = EmailService;

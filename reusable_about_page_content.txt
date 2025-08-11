@@ -1,0 +1,493 @@
+// components/ui/PolaroidCard.tsx
+import React from 'react';
+
+interface PolaroidCardProps {
+  src: string;
+  alt: string;
+  caption: string;
+  className?: string;
+  rotation?: 'left' | 'right' | 'none';
+  size?: 'small' | 'medium' | 'large';
+  isDark?: boolean;
+}
+
+export const PolaroidCard: React.FC<PolaroidCardProps> = ({
+  src,
+  alt,
+  caption,
+  className = '',
+  rotation = 'left',
+  size = 'medium',
+  isDark = false
+}) => {
+  const rotationClasses = {
+    left: '-rotate-2 group-hover:rotate-0',
+    right: 'rotate-2 group-hover:rotate-0',
+    none: 'rotate-0'
+  };
+
+  const sizeClasses = {
+    small: 'h-24',
+    medium: 'h-32',
+    large: 'h-40'
+  };
+
+  return (
+    <div className={`relative ${className}`}>
+      <div className={`p-3 rounded-2xl transform ${rotationClasses[rotation]} transition-transform duration-300 ${
+        isDark ? 'bg-gray-700' : 'bg-gray-100'
+      }`}>
+        <img
+          src={src}
+          alt={alt}
+          className={`w-full ${sizeClasses[size]} object-cover rounded-xl`}
+        />
+        <div className={`text-center mt-2 text-sm italic ${
+          isDark ? 'text-gray-400' : 'text-gray-600'
+        }`}>
+          {caption}
+        </div>
+      </div>
+      {/* Decorative pins */}
+      <div className="absolute -top-2 -left-2 w-4 h-4 bg-red-500 rounded-full shadow-lg"></div>
+      <div className="absolute -top-2 -right-2 w-4 h-4 bg-blue-500 rounded-full shadow-lg"></div>
+    </div>
+  );
+};
+
+// components/ui/StatCard.tsx
+interface StatCardProps {
+  value: string;
+  label: string;
+  color?: 'purple' | 'cyan' | 'pink' | 'green';
+  isDark?: boolean;
+}
+
+export const StatCard: React.FC<StatCardProps> = ({
+  value,
+  label,
+  color = 'purple',
+  isDark = false
+}) => {
+  const colorClasses = {
+    purple: isDark ? 'text-purple-400' : 'text-purple-600',
+    cyan: isDark ? 'text-cyan-400' : 'text-cyan-600',
+    pink: isDark ? 'text-pink-400' : 'text-pink-600',
+    green: isDark ? 'text-green-400' : 'text-green-600'
+  };
+
+  return (
+    <div className="text-center">
+      <div className={`text-2xl font-bold ${colorClasses[color]}`}>
+        {value}
+      </div>
+      <div className={`text-xs ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>
+        {label}
+      </div>
+    </div>
+  );
+};
+
+// components/ui/ServiceItem.tsx
+interface ServiceItemProps {
+  icon: string;
+  text: string;
+  isDark?: boolean;
+}
+
+export const ServiceItem: React.FC<ServiceItemProps> = ({
+  icon,
+  text,
+  isDark = false
+}) => {
+  return (
+    <div className="flex items-center space-x-2">
+      <span className="text-sm">{icon}</span>
+      <span className={`text-sm ${isDark ? 'text-gray-300' : 'text-gray-700'}`}>
+        {text}
+      </span>
+    </div>
+  );
+};
+
+// components/ui/AnimatedCard.tsx
+interface AnimatedCardProps {
+  children: React.ReactNode;
+  rotation?: 'left' | 'right' | 'none';
+  gradient?: string;
+  border?: string;
+  className?: string;
+  isDark?: boolean;
+  animationDelay?: string;
+}
+
+export const AnimatedCard: React.FC<AnimatedCardProps> = ({
+  children,
+  rotation = 'left',
+  gradient,
+  border,
+  className = '',
+  isDark = false,
+  animationDelay = '0s'
+}) => {
+  const rotationClasses = {
+    left: 'rotate-1 hover:rotate-0',
+    right: '-rotate-1 hover:rotate-0',
+    none: 'rotate-0'
+  };
+
+  const defaultBg = isDark 
+    ? 'bg-gray-800 border border-gray-700' 
+    : 'bg-white border border-gray-200';
+
+  const backgroundClasses = gradient || defaultBg;
+  const borderClasses = border || '';
+
+  return (
+    <div 
+      className={`relative transform ${rotationClasses[rotation]} transition-all duration-500 group ${backgroundClasses} ${borderClasses} rounded-3xl p-6 shadow-2xl hover:shadow-3xl ${className}`}
+      style={{ animationDelay }}
+    >
+      {children}
+    </div>
+  );
+};
+
+// components/ui/SectionHeader.tsx
+interface SectionHeaderProps {
+  title: string;
+  subtitle?: string;
+  icon?: React.ReactNode;
+  isDark?: boolean;
+}
+
+export const SectionHeader: React.FC<SectionHeaderProps> = ({
+  title,
+  subtitle,
+  icon,
+  isDark = false
+}) => {
+  return (
+    <div className="space-y-4">
+      <h3 className={`text-xl font-bold flex items-center space-x-2 ${
+        isDark ? 'text-white' : 'text-gray-900'
+      }`}>
+        {icon && <span>{icon}</span>}
+        <span>{title}</span>
+      </h3>
+      {subtitle && (
+        <p className={`text-sm leading-relaxed ${
+          isDark ? 'text-gray-300' : 'text-gray-700'
+        }`}>
+          {subtitle}
+        </p>
+      )}
+    </div>
+  );
+};
+
+// components/ui/TagList.tsx
+interface Tag {
+  text: string;
+  color?: string;
+}
+
+interface TagListProps {
+  tags: Tag[];
+  isDark?: boolean;
+  className?: string;
+}
+
+export const TagList: React.FC<TagListProps> = ({
+  tags,
+  isDark = false,
+  className = ''
+}) => {
+  return (
+    <div className={`flex flex-wrap justify-center gap-3 ${className}`}>
+      {tags.map((tag, index) => (
+        <span
+          key={index}
+          className={`px-4 py-2 rounded-full text-sm font-medium transform hover:scale-110 transition-transform ${
+            isDark
+              ? 'bg-orange-800/50 text-orange-300'
+              : 'bg-orange-200 text-orange-800'
+          }`}
+        >
+          {tag.text}
+        </span>
+      ))}
+    </div>
+  );
+};
+
+// components/about/MissionCard.tsx
+interface MissionCardProps {
+  isDark?: boolean;
+}
+
+export const MissionCard: React.FC<MissionCardProps> = ({ isDark = false }) => {
+  return (
+    <AnimatedCard rotation="left" isDark={isDark}>
+      <PolaroidCard
+        src="https://images.unsplash.com/photo-1522071820081-009f0129c71c?w=400&h=250&fit=crop&crop=focalpoint&fp-x=0.5&fp-y=0.3"
+        alt="Team collaboration"
+        caption='"Building dreams together" ✨'
+        size="large"
+        rotation="left"
+        isDark={isDark}
+        className="mb-6"
+      />
+
+      <SectionHeader
+        title="Our Mission"
+        subtitle="Founded with the mission to make professional web development accessible to businesses of all sizes, we combine creativity with technical expertise to deliver outstanding results."
+        icon="🎯"
+        isDark={isDark}
+      />
+    </AnimatedCard>
+  );
+};
+
+// components/about/ServicesCard.tsx
+interface ServicesCardProps {
+  isDark?: boolean;
+  services?: Array<{ icon: string; text: string }>;
+}
+
+export const ServicesCard: React.FC<ServicesCardProps> = ({ 
+  isDark = false,
+  services = [
+    { icon: "🎨", text: "Custom Web Design" },
+    { icon: "📱", text: "Mobile Development" },
+    { icon: "🎬", text: "Video Content" },
+    { icon: "📊", text: "Digital Marketing" },
+  ]
+}) => {
+  const gradientClasses = isDark
+    ? 'bg-gradient-to-br from-purple-900/50 to-blue-900/50 border border-purple-700'
+    : 'bg-gradient-to-br from-purple-100 to-blue-100 border border-purple-200';
+
+  return (
+    <AnimatedCard 
+      rotation="right" 
+      gradient={gradientClasses} 
+      isDark={isDark}
+      animationDelay="0.2s"
+    >
+      <div className={`relative mb-6 p-2 rounded-xl transform rotate-2 group-hover:rotate-0 transition-transform duration-300 ${
+        isDark ? 'bg-gray-700' : 'bg-white'
+      }`}>
+        <img
+          src="https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=300&h=200&fit=crop&crop=focalpoint&fp-x=0.5&fp-y=0.4"
+          alt="Web development workspace"
+          className="w-full h-32 object-cover rounded-lg"
+        />
+        <div className={`text-center mt-1 text-xs ${
+          isDark ? 'text-gray-400' : 'text-gray-600'
+        }`}>
+          "Crafting digital magic" 🚀
+        </div>
+        <div className="absolute -top-1 -right-1 w-3 h-3 bg-yellow-500 rounded-full shadow-lg"></div>
+      </div>
+
+      <div className="space-y-4">
+        <SectionHeader
+          title="What We Do"
+          icon="💡"
+          isDark={isDark}
+        />
+
+        <div className="space-y-2">
+          {services.map((service, index) => (
+            <ServiceItem
+              key={index}
+              icon={service.icon}
+              text={service.text}
+              isDark={isDark}
+            />
+          ))}
+        </div>
+      </div>
+    </AnimatedCard>
+  );
+};
+
+// components/about/ImpactCard.tsx
+interface ImpactCardProps {
+  isDark?: boolean;
+  stats?: Array<{ value: string; label: string; color: 'purple' | 'cyan' | 'pink' | 'green' }>;
+}
+
+export const ImpactCard: React.FC<ImpactCardProps> = ({ 
+  isDark = false,
+  stats = [
+    { value: "500+", label: "Happy Clients", color: "purple" },
+    { value: "3+", label: "Years", color: "cyan" },
+    { value: "100%", label: "Satisfaction", color: "pink" },
+    { value: "24/7", label: "Support", color: "green" },
+  ]
+}) => {
+  const gradientClasses = isDark
+    ? 'bg-gradient-to-br from-teal-900/50 to-green-900/50 border border-teal-700'
+    : 'bg-gradient-to-br from-teal-100 to-green-100 border border-teal-200';
+
+  return (
+    <AnimatedCard 
+      rotation="left" 
+      gradient={gradientClasses} 
+      isDark={isDark}
+      animationDelay="0.4s"
+    >
+      <div className={`relative mb-6 p-2 rounded-xl transform -rotate-3 group-hover:rotate-0 transition-transform duration-300 ${
+        isDark ? 'bg-gray-700' : 'bg-white'
+      }`}>
+        <img
+          src="https://images.unsplash.com/photo-1515378960530-7c0da6231fb1?w=300&h=150&fit=crop&crop=focalpoint&fp-x=0.5&fp-y=0.3"
+          alt="Success and growth"
+          className="w-full h-24 object-cover rounded-lg"
+        />
+        <div className={`text-center mt-1 text-xs ${
+          isDark ? 'text-gray-400' : 'text-gray-600'
+        }`}>
+          "Growing together" 🌱
+        </div>
+        <div className="absolute -bottom-1 -left-1 w-3 h-3 bg-green-500 rounded-full shadow-lg"></div>
+      </div>
+
+      <div className="space-y-4">
+        <SectionHeader
+          title="Our Impact"
+          icon="❤️"
+          isDark={isDark}
+        />
+
+        <div className="grid grid-cols-2 gap-3">
+          {stats.map((stat, index) => (
+            <StatCard
+              key={index}
+              value={stat.value}
+              label={stat.label}
+              color={stat.color}
+              isDark={isDark}
+            />
+          ))}
+        </div>
+      </div>
+    </AnimatedCard>
+  );
+};
+
+// components/about/StorySection.tsx
+interface StorySectionProps {
+  isDark?: boolean;
+  title?: string;
+  description?: string;
+  tags?: Array<{ text: string; color?: string }>;
+}
+
+export const StorySection: React.FC<StorySectionProps> = ({
+  isDark = false,
+  title = "Growing Digital Dreams",
+  description = "Every website we build, every brand we help grow, and every small business we empower is a step toward our vision of a more connected, thriving digital community. We don't just build websites – we build relationships, dreams, and futures.",
+  tags = [
+    { text: "Innovation" },
+    { text: "Growth" },
+    { text: "Community" },
+    { text: "Excellence" }
+  ]
+}) => {
+  const gradientClasses = isDark
+    ? 'bg-gradient-to-r from-orange-900/50 to-pink-900/50 border border-orange-700'
+    : 'bg-gradient-to-r from-orange-100 to-pink-100 border border-orange-200';
+
+  return (
+    <AnimatedCard 
+      rotation="none" 
+      gradient={gradientClasses} 
+      isDark={isDark}
+      className="hover:scale-105"
+      animationDelay="0.6s"
+    >
+      <div className="text-center space-y-4">
+        <div className="flex justify-center items-center space-x-3 mb-4">
+          <span className="text-2xl">🚀</span>
+          <h3 className={`text-2xl font-bold ${
+            isDark ? 'text-white' : 'text-gray-900'
+          }`}>
+            {title}
+          </h3>
+          <span className="text-2xl">✨</span>
+        </div>
+
+        <p className={`text-lg leading-relaxed max-w-4xl mx-auto ${
+          isDark ? 'text-gray-300' : 'text-gray-700'
+        }`}>
+          {description}
+        </p>
+
+        <TagList tags={tags} isDark={isDark} className="mt-6" />
+      </div>
+    </AnimatedCard>
+  );
+};
+
+// components/about/AboutSection.tsx - Main component that combines everything
+interface AboutSectionProps {
+  isDark?: boolean;
+  customServices?: Array<{ icon: string; text: string }>;
+  customStats?: Array<{ value: string; label: string; color: 'purple' | 'cyan' | 'pink' | 'green' }>;
+  customStory?: {
+    title?: string;
+    description?: string;
+    tags?: Array<{ text: string; color?: string }>;
+  };
+}
+
+export const AboutSection: React.FC<AboutSectionProps> = ({
+  isDark = false,
+  customServices,
+  customStats,
+  customStory
+}) => {
+  return (
+    <div className="space-y-8">
+      {/* Three Cards Grid */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <MissionCard isDark={isDark} />
+        <ServicesCard isDark={isDark} services={customServices} />
+        <ImpactCard isDark={isDark} stats={customStats} />
+      </div>
+
+      {/* Story Section */}
+      <StorySection isDark={isDark} {...customStory} />
+    </div>
+  );
+};
+
+// pages/About.tsx - Updated main About page using the new components
+import React from 'react';
+import Section from "../components/Section";
+import { AboutSection } from "../components/about/AboutSection";
+
+interface AboutProps {
+  isDark: boolean;
+}
+
+const About: React.FC<AboutProps> = ({ isDark }) => {
+  return (
+    <Section id="about-page" className="pt-32 pb-20">
+      <div className="text-center mb-16">
+        <h1 className="text-4xl font-bold mb-8">About Blue Sprout Agency</h1>
+        <p className="text-lg max-w-4xl mx-auto">
+          We are a team of creatives and developers helping small businesses
+          grow their digital presence through modern, user-friendly solutions.
+        </p>
+      </div>
+      
+      <AboutSection isDark={isDark} />
+    </Section>
+  );
+};
+
+export default About;
