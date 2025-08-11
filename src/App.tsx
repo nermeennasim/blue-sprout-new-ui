@@ -12,6 +12,7 @@ import Pricing from "./pages/Pricing";
 import Testimonials from "./pages/Testimonials";
 import Contact from "./pages/Contact";
 import Clients from "./pages/Clients";
+import NotFound from "./pages/NotFound";
 
 const App = () => {
 	const [isDark, setIsDark] = useState(false);
@@ -38,6 +39,8 @@ const App = () => {
 						element={<Testimonials isDark={isDark} />}
 					/>
 					<Route path="/contact" element={<Contact isDark={isDark} />} />
+					{/* 404 Route - MUST be last */}
+					<Route path="*" element={<NotFound isDark={isDark} />} />
 				</Routes>
 
 				<Footer isDark={isDark} />
