@@ -1,34 +1,67 @@
 // components/Footer.tsx
-import { Link } from "react-router-dom";
-import { Sprout } from "lucide-react";
+import { useNavigate } from "react-router-dom";
+import { FaFacebook, FaInstagram, FaLinkedin, FaTwitter } from "react-icons/fa";
+import sprtLogo192 from "../assets/sprout-logo-192.png";
 
-interface FooterProps {
+export interface FooterProps {
 	isDark: boolean;
 }
 
 export const Footer: React.FC<FooterProps> = ({ isDark }) => {
 	const currentYear = new Date().getFullYear();
+	const navigate = useNavigate();
+
+	// Debug function to handle navigation
+	const handleGetStartedClick = (e: React.MouseEvent) => {
+		e.preventDefault();
+		console.log("Get Started button clicked - navigating to /contact");
+		navigate("/contact");
+
+		// Scroll to top after navigation
+		setTimeout(() => {
+			window.scrollTo({ top: 0, behavior: "smooth" });
+		}, 100);
+	};
+
+	// Handle all navigation with smooth scroll
+	const handleNavigation = (path: string) => {
+		navigate(path);
+		setTimeout(() => {
+			window.scrollTo({ top: 0, behavior: "smooth" });
+		}, 100);
+	};
 
 	return (
 		<footer
-			className={`${
+			className={`relative z-10 ${
 				isDark ? "bg-gray-800 text-gray-300" : "bg-gray-900 text-gray-100"
 			} py-12`}>
 			<div className="max-w-6xl mx-auto px-6">
 				<div className="grid md:grid-cols-4 gap-8">
 					{/* Company Info */}
 					<div className="md:col-span-2">
-						<Link to="/" className="flex items-center space-x-3 mb-4">
+						<button
+							onClick={() => handleNavigation("/")}
+							className="flex items-center space-x-3 mb-4 hover:opacity-80 transition-opacity">
 							<div
 								className={`p-2 rounded-lg ${
 									isDark ? "bg-orange-500" : "bg-teal-500"
 								}`}>
-								<Sprout className="w-6 h-6 text-white" />
+								<img
+									src={sprtLogo192}
+									alt="Blue Sprout Agency Logo"
+									className="w-12 h-12 rounded-full transition-all duration-300 group-hover:scale-125 drop-shadow-lg object-cover"
+									style={{
+										filter: isDark
+											? "drop-shadow(0 4px 12px rgba(249, 115, 22, 0.4)) drop-shadow(0 0 20px rgba(249, 115, 22, 0.2))"
+											: "drop-shadow(0 4px 12px rgba(20, 184, 166, 0.4)) drop-shadow(0 0 20px rgba(20, 184, 166, 0.2))",
+									}}
+								/>
 							</div>
 							<span className="text-xl font-bold text-white">
 								Blue Sprout Agency
 							</span>
-						</Link>
+						</button>
 						<p className="mb-4 max-w-md">
 							Helping small businesses grow their digital presence with
 							professional social media management, web development, and video
@@ -50,18 +83,19 @@ export const Footer: React.FC<FooterProps> = ({ isDark }) => {
 								{ name: "Home", path: "/" },
 								{ name: "About", path: "/about" },
 								{ name: "Services", path: "/services" },
+								{ name: "Our Clients", path: "/clients" },
 								{ name: "Pricing", path: "/pricing" },
 								{ name: "Testimonials", path: "/testimonials" },
 								{ name: "Contact", path: "/contact" },
 							].map((link, index) => (
 								<li key={index}>
-									<Link
-										to={link.path}
-										className={`hover:text-white transition-colors ${
+									<button
+										onClick={() => handleNavigation(link.path)}
+										className={`hover:text-white transition-colors text-left ${
 											isDark ? "hover:text-orange-400" : "hover:text-teal-400"
 										}`}>
 										{link.name}
-									</Link>
+									</button>
 								</li>
 							))}
 						</ul>
@@ -75,42 +109,66 @@ export const Footer: React.FC<FooterProps> = ({ isDark }) => {
 								href="https://facebook.com/bluesproutagency"
 								target="_blank"
 								rel="noopener noreferrer"
-								className={`block hover:text-white transition-colors ${
+								className={`flex items-center space-x-2 hover:text-white transition-colors ${
 									isDark ? "hover:text-orange-400" : "hover:text-teal-400"
 								}`}>
-								📘 Facebook: @bluesproutagency
+								<FaFacebook className="w-5 h-5" />
+								<span>Facebook: @bluesproutagency</span>
 							</a>
 							<a
 								href="https://instagram.com/bluesproutagency"
 								target="_blank"
 								rel="noopener noreferrer"
-								className={`block hover:text-white transition-colors ${
+								className={`flex items-center space-x-2 hover:text-white transition-colors ${
 									isDark ? "hover:text-orange-400" : "hover:text-teal-400"
 								}`}>
-								📸 Instagram: @bluesproutagency
+								<FaInstagram className="w-5 h-5" />
+								<span>Instagram: @bluesproutagency</span>
 							</a>
 							<a
 								href="https://twitter.com/blusproutagency"
 								target="_blank"
 								rel="noopener noreferrer"
-								className={`block hover:text-white transition-colors ${
+								className={`flex items-center space-x-2 hover:text-white transition-colors ${
 									isDark ? "hover:text-orange-400" : "hover:text-teal-400"
 								}`}>
-								🐦 Twitter: @blusproutagency
+								<FaTwitter className="w-5 h-5" />
+								<span>Twitter: @blusproutagency</span>
+							</a>
+							<a
+								href="https://www.linkedin.com/company/blue-sprout-agency/"
+								target="_blank"
+								rel="noopener noreferrer"
+								className={`flex items-center space-x-2 hover:text-white transition-colors ${
+									isDark ? "hover:text-orange-400" : "hover:text-teal-400"
+								}`}>
+								<FaLinkedin className="w-5 h-5" />
+								<span>Linkedin: @blue-sprout-agency</span>
 							</a>
 						</div>
 
-						{/* CTA */}
-						<div className="mt-6">
-							<Link
-								to="/contact"
-								className={`inline-block px-6 py-3 rounded-lg font-semibold transition-all duration-300 hover:scale-105 ${
+						{/* CTA - Updated with debugging and smooth scroll */}
+						<div className="mt-6 space-y-3">
+							<button
+								onClick={handleGetStartedClick}
+								className={`block w-full text-center px-6 py-3 rounded-lg font-semibold transition-all duration-300 hover:scale-105 cursor-pointer ${
 									isDark
 										? "bg-orange-500 text-white hover:bg-orange-600"
 										: "bg-teal-500 text-white hover:bg-teal-600"
 								}`}>
 								Get Started Today
-							</Link>
+							</button>
+
+							{/* Alternative Link version for testing */}
+							<button
+								onClick={() => handleNavigation("/contact")}
+								className={`block w-full text-center px-6 py-3 rounded-lg font-semibold transition-all duration-300 hover:scale-105 border-2 ${
+									isDark
+										? "border-orange-500 text-orange-400 hover:bg-orange-500 hover:text-white"
+										: "border-teal-500 text-teal-400 hover:bg-teal-500 hover:text-white"
+								}`}>
+								Contact Us
+							</button>
 						</div>
 					</div>
 				</div>
@@ -125,4 +183,3 @@ export const Footer: React.FC<FooterProps> = ({ isDark }) => {
 		</footer>
 	);
 };
-// components/Footer.tsx

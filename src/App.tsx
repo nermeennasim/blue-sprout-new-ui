@@ -11,6 +11,7 @@ import Services from "./pages/Services";
 import Pricing from "./pages/Pricing";
 import Testimonials from "./pages/Testimonials";
 import Contact from "./pages/Contact";
+import Clients from "./pages/Clients";
 
 const App = () => {
 	const [isDark, setIsDark] = useState(false);
@@ -29,6 +30,8 @@ const App = () => {
 					<Route path="/" element={<Home isDark={isDark} />} />
 					<Route path="/about" element={<About isDark={isDark} />} />
 					<Route path="/services" element={<Services isDark={isDark} />} />
+					<Route path="/clients" element={<Clients isDark={isDark} />} />
+
 					<Route path="/pricing" element={<Pricing isDark={isDark} />} />
 					<Route
 						path="/testimonials"

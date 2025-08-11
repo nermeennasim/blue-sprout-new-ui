@@ -1,5 +1,5 @@
 // components/Hero.tsx
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import {
 	ArrowRight,
 	Star,
@@ -8,301 +8,451 @@ import {
 	Zap,
 	Target,
 	TrendingUp,
+	Phone,
+	Mail,
 } from "lucide-react";
+import { useState, useEffect, useRef } from "react";
 
-// Import your logo files - REMOVED, not needed in Hero
-// import sprtLogoSvg from '../assets/sprout.svg';
-// import sprtLogo192 from '../assets/sprout-logo-192.png';
-// import sprtLogo512 from '../assets/sprout-logo-512.png';
-
-export interface HeroProps {
+interface HeroProps {
 	isDark: boolean;
 }
 
 export const Hero: React.FC<HeroProps> = ({ isDark }) => {
+	const [isContactVisible, setIsContactVisible] = useState(false);
+	const [showFlyingPhone, setShowFlyingPhone] = useState(false);
+	const navigate = useNavigate();
+	const heroRef = useRef<HTMLElement>(null);
+
+	useEffect(() => {
+		const handleScroll = () => {
+			const scrollY = window.scrollY;
+			const windowHeight = window.innerHeight;
+
+			// Show contact info after scrolling 30% of viewport height
+			setIsContactVisible(scrollY > windowHeight * 0.3);
+		};
+
+		window.addEventListener("scroll", handleScroll);
+		return () => window.removeEventListener("scroll", handleScroll);
+	}, []);
+
+	// Flying phone number effect
+	useEffect(() => {
+		const interval = setInterval(() => {
+			setShowFlyingPhone(true);
+			setTimeout(() => setShowFlyingPhone(false), 4000);
+		}, 8000);
+
+		return () => clearInterval(interval);
+	}, []);
+
+	// Smooth scroll to contact
+	const handleGetStarted = (e: React.MouseEvent) => {
+		e.preventDefault();
+		navigate("/contact");
+		setTimeout(() => {
+			window.scrollTo({ top: 0, behavior: "smooth" });
+		}, 100);
+	};
+
 	return (
-		<section
-			className={`relative min-h-screen flex items-center justify-center overflow-hidden ${
-				isDark
-					? "bg-gradient-to-br from-gray-900 via-blue-900 to-purple-900"
-					: "bg-gradient-to-br from-blue-50 via-white to-purple-50"
-			}`}>
-			{/* Animated Background Elements */}
-			<div className="absolute inset-0 bg-grid-pattern opacity-5"></div>
-			<div className="absolute top-20 left-10 w-20 h-20 bg-blue-500/20 rounded-full blur-xl animate-pulse"></div>
-			<div className="absolute bottom-20 right-10 w-32 h-32 bg-purple-500/20 rounded-full blur-xl animate-pulse delay-1000"></div>
-			<div className="absolute top-1/2 left-1/4 w-16 h-16 bg-pink-500/20 rounded-full blur-xl animate-pulse delay-500"></div>
-
-			{/* Floating Elements for Animation */}
-			<div className="absolute top-32 right-20 animate-bounce-gentle delay-300">
-				<div
-					className={`p-3 rounded-lg ${
-						isDark ? "bg-orange-500/20" : "bg-teal-500/20"
-					} backdrop-blur-sm`}>
-					<TrendingUp
-						className={`w-6 h-6 ${
-							isDark ? "text-orange-400" : "text-teal-600"
-						}`}
-					/>
-				</div>
-			</div>
-			<div className="absolute bottom-32 left-20 animate-bounce-gentle delay-700">
-				<div
-					className={`p-3 rounded-lg ${
-						isDark ? "bg-purple-500/20" : "bg-blue-500/20"
-					} backdrop-blur-sm`}>
-					<Target
-						className={`w-6 h-6 ${
-							isDark ? "text-purple-400" : "text-blue-600"
-						}`}
-					/>
-				</div>
-			</div>
-
-			<div className="relative z-10 max-w-7xl mx-auto px-6 py-20">
-				{/* Announcement Banners - Fixed positioning */}
-				<div className="text-center mb-12 space-y-4">
-					{/* Contact Form Banner */}
-					<div className="inline-flex items-center px-6 py-3 bg-gradient-to-r from-yellow-500 to-orange-500 text-white rounded-full font-bold animate-pulse-glow shadow-lg text-sm md:text-base">
-						🚧 Contact Form Under Development - Call Us Directly!
-					</div>
-
-					{/* Special Offer Banner */}
-					<div className="inline-flex items-center px-6 py-3 bg-gradient-to-r from-green-500 to-emerald-500 text-white rounded-full font-bold animate-bounce-gentle shadow-lg text-sm md:text-base">
-						🔥 Lowest Pricing Offer - Limited Time Only!
-					</div>
-				</div>
-
-				{/* Main Hero Content */}
-				<div className="text-center mb-16">
-					{/* Brand Tagline - No Logo Needed Here */}
-					<div className="mb-8">
-						<p
-							className={`text-lg font-medium ${
-								isDark ? "text-gray-400" : "text-gray-500"
-							}`}>
-							Your Growth Partner in Chino, CA
-						</p>
-					</div>
-
-					{/* Animated Main Headlines */}
-					<div className="space-y-6 mb-8">
-						<h1
-							className={`text-4xl md:text-6xl lg:text-7xl font-bold leading-tight animate-fade-in ${
-								isDark ? "text-white" : "text-gray-900"
-							}`}>
-							At Blue Sprout Agency
-							<span className="block bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 bg-clip-text text-transparent animate-gradient">
-								We Transform Small Businesses
+		<>
+			<section
+				ref={heroRef}
+				className={`relative min-h-screen flex items-center justify-center overflow-hidden ${
+					isDark ? "bg-gray-900" : "bg-white"
+				} mt-10`}>
+				{" "}
+				{/* Added mt-10 for development banner */}
+				{/* Flying Phone Number */}
+				{showFlyingPhone && (
+					<div className="fixed top-0 left-0 w-full h-full pointer-events-none z-40 overflow-hidden">
+						<div
+							className={`absolute top-1/2 -left-96 transform -translate-y-1/2 ${
+								isDark ? "text-orange-400" : "text-teal-600"
+							} text-2xl font-bold animate-fly-across flex items-center space-x-3 bg-gradient-to-r ${
+								isDark
+									? "from-orange-500/20 to-red-500/20"
+									: "from-teal-500/20 to-blue-500/20"
+							} backdrop-blur-sm px-6 py-3 rounded-full border ${
+								isDark ? "border-orange-500/30" : "border-teal-500/30"
+							} shadow-2xl`}>
+							<Phone className="w-8 h-8 animate-bounce" />
+							<span className="text-3xl font-extrabold tracking-wider">
+								📞 (657) 217-4737
 							</span>
+							<div className="text-lg">👈 CALL NOW!</div>
+						</div>
+					</div>
+				)}
+				{/* Background Pattern */}
+				<div className="absolute inset-0 opacity-10">
+					<div
+						className="absolute inset-0"
+						style={{
+							backgroundImage: `radial-gradient(circle at 1px 1px, ${
+								isDark ? "#ffffff" : "#000000"
+							} 1px, transparent 0)`,
+							backgroundSize: "50px 50px",
+						}}
+					/>
+				</div>
+				{/* Floating Elements */}
+				<div className="absolute inset-0 overflow-hidden">
+					<div
+						className={`absolute top-20 left-20 w-72 h-72 ${
+							isDark ? "bg-purple-600" : "bg-purple-500"
+						} rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-float`}></div>
+					<div
+						className={`absolute top-40 right-20 w-72 h-72 ${
+							isDark ? "bg-cyan-600" : "bg-cyan-500"
+						} rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-float-delayed`}></div>
+					<div
+						className={`absolute -bottom-8 left-40 w-72 h-72 ${
+							isDark ? "bg-pink-600" : "bg-pink-500"
+						} rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-float-slow`}></div>
+				</div>
+				{/* Main Content */}
+				<div className="relative z-10 max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+					<div className="text-center">
+						{/* Badge */}
+						<div className="inline-flex items-center space-x-2 bg-gradient-to-r from-purple-100 to-cyan-100 dark:from-purple-900/50 dark:to-cyan-900/50 px-6 py-3 rounded-full mb-8 animate-slide-down">
+							<Star
+								className={`w-5 h-5 ${
+									isDark ? "text-purple-400" : "text-purple-600"
+								} animate-spin-slow`}
+							/>
 							<span
-								className={`block text-2xl md:text-3xl lg:text-4xl font-normal mt-4 animate-slide-up ${
-									isDark ? "text-gray-300" : "text-gray-600"
-								}`}>
-								Into Online Visibility Powerhouses
+								className={`text-sm font-semibold ${
+									isDark ? "text-gray-200" : "text-gray-700"
+								} animate-type-writer`}>
+								#1 Web Development Agency in Inland Empire
+							</span>
+						</div>
+
+						{/* Main Heading */}
+						<h1
+							className={`text-4xl sm:text-6xl lg:text-7xl font-bold leading-tight mb-6 ${
+								isDark ? "text-white" : "text-gray-900"
+							} animate-fade-in-up`}>
+							<span className="block animate-slide-in-left">Premium Web</span>
+							<span className="block bg-gradient-to-r from-purple-600 via-cyan-500 to-pink-600 bg-clip-text text-transparent animate-gradient-x animate-slide-in-right">
+								Solutions
 							</span>
 						</h1>
 
-						{/* Problem Statement with Animation */}
-						<div
-							className={`p-6 rounded-2xl backdrop-blur-sm border animate-fade-in-delayed ${
-								isDark
-									? "bg-red-900/30 border-red-500/30 text-red-200"
-									: "bg-red-50 border-red-200 text-red-700"
-							}`}>
-							<h2 className="text-xl md:text-2xl font-bold mb-2">
-								🤔 Ever Wondered Why Your Clients Won't Reach You?
-							</h2>
-							<p className="text-lg">
-								<strong>They're finding your competitors instead...</strong>
-								<br />
-								While you're working hard in your business, they're dominating
-								online!
-							</p>
+						{/* Subtitle */}
+						<p
+							className={`text-lg sm:text-xl lg:text-2xl mb-12 max-w-4xl mx-auto leading-relaxed ${
+								isDark ? "text-gray-300" : "text-gray-600"
+							} animate-fade-in-up animation-delay-300`}>
+							Transform your digital presence with cutting-edge web design,
+							development, and digital marketing. We create stunning, responsive
+							websites that convert visitors into customers.
+						</p>
+
+						{/* Stats Row */}
+						<div className="flex flex-wrap justify-center items-center gap-8 mb-12">
+							<div className="flex items-center space-x-2 animate-bounce-in animation-delay-400">
+								<Users
+									className={`w-6 h-6 ${
+										isDark ? "text-cyan-400" : "text-cyan-600"
+									} animate-pulse`}
+								/>
+								<span
+									className={`text-lg font-semibold ${
+										isDark ? "text-gray-200" : "text-gray-700"
+									}`}>
+									500+ Satisfied Clients
+								</span>
+							</div>
+							<div className="flex items-center space-x-2 animate-bounce-in animation-delay-500">
+								<Award
+									className={`w-6 h-6 ${
+										isDark ? "text-purple-400" : "text-purple-600"
+									} animate-pulse`}
+								/>
+								<span
+									className={`text-lg font-semibold ${
+										isDark ? "text-gray-200" : "text-gray-700"
+									}`}>
+									Award-Winning Designs
+								</span>
+							</div>
+							<div className="flex items-center space-x-2 animate-bounce-in animation-delay-600">
+								<Zap
+									className={`w-6 h-6 ${
+										isDark ? "text-pink-400" : "text-pink-600"
+									} animate-pulse`}
+								/>
+								<span
+									className={`text-lg font-semibold ${
+										isDark ? "text-gray-200" : "text-gray-700"
+									}`}>
+									Lightning Fast
+								</span>
+							</div>
 						</div>
 
-						{/* Solution Statement */}
-						<div
-							className={`p-6 rounded-2xl backdrop-blur-sm border animate-fade-in-delayed-more ${
-								isDark
-									? "bg-green-900/30 border-green-500/30 text-green-200"
-									: "bg-green-50 border-green-200 text-green-700"
-							}`}>
-							<h2 className="text-xl md:text-2xl font-bold mb-2">
-								✨ We Fix That Problem
-							</h2>
-							<p className="text-lg">
-								<strong>
-									📱 Social Media Management • 🌐 Professional Websites • 🎬
-									Viral Videos
-								</strong>
-								<br />
-								Get found first, get chosen first, grow faster than ever!
-							</p>
-						</div>
-					</div>
+						{/* CTA Buttons */}
+						<div className="flex flex-col sm:flex-row gap-6 justify-center items-center mb-16">
+							<button
+								onClick={handleGetStarted}
+								className="group bg-gradient-to-r from-purple-600 to-cyan-600 hover:from-purple-700 hover:to-cyan-700 text-white px-8 py-4 rounded-full text-lg font-semibold transition-all duration-300 transform hover:scale-105 hover:shadow-2xl flex items-center space-x-2 animate-button-glow">
+								<span>Start Your Project</span>
+								<ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+							</button>
 
-					{/* CTA Buttons with Animation */}
-					<div className="flex flex-col sm:flex-row gap-6 justify-center items-center mb-16 animate-slide-up-delayed">
-						<Link
-							to="/contact"
-							className="group inline-flex items-center px-8 py-4 bg-gradient-to-r from-blue-600 to-purple-600 text-white font-bold text-lg rounded-full hover:from-blue-700 hover:to-purple-700 transform hover:scale-105 transition-all duration-300 shadow-lg hover:shadow-xl animate-pulse">
-							Transform My Business Now
-							<ArrowRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" />
-						</Link>
+							<Link
+								to="/portfolio"
+								className={`group px-8 py-4 rounded-full text-lg font-semibold transition-all duration-300 transform hover:scale-105 flex items-center space-x-2 border-2 animate-button-glow animation-delay-200 ${
+									isDark
+										? "border-gray-700 text-gray-300 hover:border-purple-500 hover:text-purple-400"
+										: "border-gray-300 text-gray-700 hover:border-purple-600 hover:text-purple-600"
+								}`}>
+								<span>View Our Work</span>
+								<TrendingUp className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+							</Link>
+						</div>
 
-						<a
-							href="tel:+16572174737"
-							className={`inline-flex items-center px-8 py-4 border-2 border-blue-600 font-bold text-lg rounded-full hover:bg-blue-600 hover:text-white transition-all duration-300 hover:scale-105 ${
-								isDark ? "text-blue-400" : "text-blue-600"
-							}`}>
-							📞 Call: (657) 217-4737
-						</a>
-					</div>
+						{/* Service Highlights */}
+						<div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-4xl mx-auto">
+							<div
+								className={`p-6 rounded-xl backdrop-blur-sm transition-all duration-500 hover:scale-105 animate-card-float ${
+									isDark
+										? "bg-gray-800/50 border border-gray-700"
+										: "bg-white/80 border border-gray-200 shadow-lg"
+								}`}>
+								<Target
+									className={`w-12 h-12 mx-auto mb-4 ${
+										isDark ? "text-purple-400" : "text-purple-600"
+									} animate-icon-bounce`}
+								/>
+								<h3
+									className={`text-xl font-bold mb-2 ${
+										isDark ? "text-white" : "text-gray-900"
+									} animate-text-dance`}>
+									Custom Development
+								</h3>
+								<p
+									className={`${
+										isDark ? "text-gray-300" : "text-gray-600"
+									} animate-fade-in`}>
+									Tailored solutions built with modern technologies for maximum
+									performance.
+								</p>
+							</div>
 
-					{/* Trust Indicators with Animation */}
-					<div className="flex flex-wrap justify-center items-center gap-8 mb-16 text-sm animate-fade-in-slow">
-						<div className="flex items-center space-x-2">
-							<Star className="w-5 h-5 text-yellow-400 animate-spin-slow" />
-							<span className={isDark ? "text-gray-300" : "text-gray-600"}>
-								4.9/5 Rating
-							</span>
-						</div>
-						<div className="flex items-center space-x-2">
-							<Users className="w-5 h-5 text-blue-500 animate-bounce" />
-							<span className={isDark ? "text-gray-300" : "text-gray-600"}>
-								50+ Happy Clients
-							</span>
-						</div>
-						<div className="flex items-center space-x-2">
-							<Zap className="w-5 h-5 text-purple-500 animate-pulse" />
-							<span className={isDark ? "text-gray-300" : "text-gray-600"}>
-								24hr Response
-							</span>
-						</div>
-						<div className="flex items-center space-x-2">
-							<Award className="w-5 h-5 text-green-500 animate-bounce delay-300" />
-							<span className={isDark ? "text-gray-300" : "text-gray-600"}>
-								Chino, CA Local
-							</span>
+							<div
+								className={`p-6 rounded-xl backdrop-blur-sm transition-all duration-500 hover:scale-105 animate-card-float animation-delay-200 ${
+									isDark
+										? "bg-gray-800/50 border border-gray-700"
+										: "bg-white/80 border border-gray-200 shadow-lg"
+								}`}>
+								<Star
+									className={`w-12 h-12 mx-auto mb-4 ${
+										isDark ? "text-cyan-400" : "text-cyan-600"
+									} animate-icon-bounce animation-delay-100`}
+								/>
+								<h3
+									className={`text-xl font-bold mb-2 ${
+										isDark ? "text-white" : "text-gray-900"
+									} animate-text-dance animation-delay-100`}>
+									Responsive Design
+								</h3>
+								<p
+									className={`${
+										isDark ? "text-gray-300" : "text-gray-600"
+									} animate-fade-in animation-delay-100`}>
+									Beautiful designs that work perfectly on all devices and
+									screen sizes.
+								</p>
+							</div>
+
+							<div
+								className={`p-6 rounded-xl backdrop-blur-sm transition-all duration-500 hover:scale-105 animate-card-float animation-delay-400 ${
+									isDark
+										? "bg-gray-800/50 border border-gray-700"
+										: "bg-white/80 border border-gray-200 shadow-lg"
+								}`}>
+								<TrendingUp
+									className={`w-12 h-12 mx-auto mb-4 ${
+										isDark ? "text-pink-400" : "text-pink-600"
+									} animate-icon-bounce animation-delay-200`}
+								/>
+								<h3
+									className={`text-xl font-bold mb-2 ${
+										isDark ? "text-white" : "text-gray-900"
+									} animate-text-dance animation-delay-200`}>
+									Digital Marketing
+								</h3>
+								<p
+									className={`${
+										isDark ? "text-gray-300" : "text-gray-600"
+									} animate-fade-in animation-delay-200`}>
+									Comprehensive strategies to increase your online visibility
+									and reach.
+								</p>
+							</div>
 						</div>
 					</div>
 				</div>
-
-				{/* Results Preview with Animation */}
-				<div className="grid md:grid-cols-3 gap-8 mb-16">
-					{[
-						{
-							number: "300%",
-							label: "Average Growth",
-							description: "Social media engagement boost",
-							icon: <TrendingUp className="w-8 h-8" />,
-							color: "blue",
-							delay: "animate-slide-up",
-						},
-						{
-							number: "50+",
-							label: "Success Stories",
-							description: "Local businesses transformed",
-							icon: <Users className="w-8 h-8" />,
-							color: "purple",
-							delay: "animate-slide-up-delayed",
-						},
-						{
-							number: "$1M+",
-							label: "Revenue Generated",
-							description: "Additional sales for clients",
-							icon: <Star className="w-8 h-8" />,
-							color: "pink",
-							delay: "animate-slide-up-delayed-more",
-						},
-					].map((stat, index) => (
+				{/* Scroll Indicator */}
+				<div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 animate-bounce">
+					<div
+						className={`w-6 h-10 border-2 rounded-full flex justify-center ${
+							isDark ? "border-gray-600" : "border-gray-400"
+						}`}>
 						<div
-							key={index}
-							className={`text-center p-8 rounded-2xl transition-all duration-300 hover:scale-105 transform shadow-lg hover:shadow-xl ${
-								stat.delay
-							} ${
-								isDark
-									? "bg-gray-800/50 border border-gray-700"
-									: "bg-white/80 border border-gray-200"
-							} backdrop-blur-sm`}>
-							<div
-								className={`inline-flex items-center justify-center w-16 h-16 rounded-full mb-4 animate-bounce ${
-									stat.color === "blue"
-										? "bg-blue-100 dark:bg-blue-900/30"
-										: stat.color === "purple"
-										? "bg-purple-100 dark:bg-purple-900/30"
-										: "bg-pink-100 dark:bg-pink-900/30"
-								}`}>
-								<div
-									className={
-										stat.color === "blue"
-											? "text-blue-600"
-											: stat.color === "purple"
-											? "text-purple-600"
-											: "text-pink-600"
-									}>
-									{stat.icon}
-								</div>
-							</div>
-							<div
-								className={`text-4xl font-bold mb-2 ${
-									stat.color === "blue"
-										? "text-blue-600"
-										: stat.color === "purple"
-										? "text-purple-600"
-										: "text-pink-600"
-								}`}>
-								{stat.number}
-							</div>
-							<div
-								className={`text-lg font-semibold mb-2 ${
-									isDark ? "text-white" : "text-gray-800"
-								}`}>
-								{stat.label}
-							</div>
-							<div
-								className={`text-sm ${
-									isDark ? "text-gray-400" : "text-gray-600"
-								}`}>
-								{stat.description}
-							</div>
-						</div>
-					))}
+							className={`w-1 h-3 rounded-full mt-2 animate-pulse ${
+								isDark ? "bg-gray-500" : "bg-gray-600"
+							}`}></div>
+					</div>
 				</div>
+			</section>
 
-				{/* Final CTA Section */}
+			{/* Floating Contact Info */}
+			<div
+				className={`fixed top-1/2 right-6 transform -translate-y-1/2 z-50 transition-all duration-500 ${
+					isContactVisible
+						? "translate-x-0 opacity-100"
+						: "translate-x-full opacity-0"
+				}`}>
 				<div
-					className={`text-center p-8 rounded-2xl backdrop-blur-sm border animate-fade-in-slow ${
+					className={`flex flex-col space-y-4 p-4 rounded-xl backdrop-blur-md shadow-2xl ${
 						isDark
-							? "bg-gradient-to-r from-orange-900/50 to-red-900/50 border-orange-500/30"
-							: "bg-gradient-to-r from-orange-50 to-red-50 border-orange-200"
+							? "bg-gray-900/90 border border-gray-700"
+							: "bg-white/90 border border-gray-200"
 					}`}>
-					<h2
-						className={`text-2xl md:text-3xl font-bold mb-4 ${
-							isDark ? "text-white" : "text-gray-800"
-						}`}>
-						Ready to Stop Losing Customers to Competitors?
-					</h2>
-					<p
-						className={`text-lg mb-6 ${
-							isDark ? "text-gray-300" : "text-gray-600"
-						}`}>
-						Join 50+ successful businesses in Chino, California who chose
-						visibility over invisibility
-					</p>
-					<Link
-						to="/pricing"
-						className={`inline-flex items-center px-8 py-4 rounded-full font-bold text-lg transition-all duration-300 hover:scale-105 shadow-lg hover:shadow-xl ${
+					<a
+						href="tel:+16572174737"
+						className={`group flex items-center space-x-3 p-3 rounded-lg transition-all duration-300 hover:scale-105 animate-pulse ${
 							isDark
-								? "bg-gradient-to-r from-orange-500 to-red-500 text-white hover:from-orange-600 hover:to-red-600"
-								: "bg-gradient-to-r from-orange-500 to-red-500 text-white hover:from-orange-600 hover:to-red-600"
+								? "hover:bg-gray-800 text-gray-200 hover:text-purple-400"
+								: "hover:bg-gray-50 text-gray-700 hover:text-purple-600"
 						}`}>
-						See Our Lowest Pricing Ever
-						<ArrowRight className="ml-2 w-5 h-5" />
-					</Link>
+						<Phone className="w-5 h-5 animate-ring" />
+						<span className="text-sm font-medium whitespace-nowrap">
+							Call Us
+						</span>
+					</a>
+
+					<a
+						href="mailto:support@bluesproutagency.com"
+						className={`group flex items-center space-x-3 p-3 rounded-lg transition-all duration-300 hover:scale-105 ${
+							isDark
+								? "hover:bg-gray-800 text-gray-200 hover:text-cyan-400"
+								: "hover:bg-gray-50 text-gray-700 hover:text-cyan-600"
+						}`}>
+						<Mail className="w-5 h-5" />
+						<span className="text-sm font-medium whitespace-nowrap">
+							Email Us
+						</span>
+					</a>
 				</div>
 			</div>
-		</section>
+
+			{/* CSS Animations */}
+			<style>{`
+				@keyframes fly-across {
+					0% { transform: translateX(-100%) translateY(-50%); }
+					100% { transform: translateX(calc(100vw + 400px)) translateY(-50%); }
+				}
+				
+				@keyframes float {
+					0%, 100% { transform: translate(0px, 0px) scale(1); }
+					33% { transform: translate(30px, -50px) scale(1.1); }
+					66% { transform: translate(-20px, 20px) scale(0.9); }
+				}
+				
+				@keyframes gradient-x {
+					0%, 100% { background-position: 0% 50%; }
+					50% { background-position: 100% 50%; }
+				}
+				
+				@keyframes slide-down {
+					from { transform: translateY(-20px); opacity: 0; }
+					to { transform: translateY(0); opacity: 1; }
+				}
+				
+				@keyframes slide-in-left {
+					from { transform: translateX(-50px); opacity: 0; }
+					to { transform: translateX(0); opacity: 1; }
+				}
+				
+				@keyframes slide-in-right {
+					from { transform: translateX(50px); opacity: 0; }
+					to { transform: translateX(0); opacity: 1; }
+				}
+				
+				@keyframes fade-in-up {
+					from { transform: translateY(30px); opacity: 0; }
+					to { transform: translateY(0); opacity: 1; }
+				}
+				
+				@keyframes bounce-in {
+					from { transform: scale(0.3); opacity: 0; }
+					50% { transform: scale(1.05); opacity: 0.8; }
+					to { transform: scale(1); opacity: 1; }
+				}
+				
+				@keyframes text-dance {
+					0%, 100% { transform: translateY(0px); }
+					25% { transform: translateY(-5px); }
+					50% { transform: translateY(-2px); }
+					75% { transform: translateY(-7px); }
+				}
+				
+				@keyframes icon-bounce {
+					0%, 100% { transform: translateY(0px) scale(1); }
+					50% { transform: translateY(-10px) scale(1.1); }
+				}
+				
+				@keyframes card-float {
+					0%, 100% { transform: translateY(0px); }
+					50% { transform: translateY(-5px); }
+				}
+				
+				@keyframes button-glow {
+					0%, 100% { box-shadow: 0 0 20px rgba(168, 85, 247, 0.4); }
+					50% { box-shadow: 0 0 40px rgba(168, 85, 247, 0.6); }
+				}
+				
+				@keyframes ring {
+					0%, 100% { transform: rotate(0deg); }
+					25% { transform: rotate(-15deg); }
+					75% { transform: rotate(15deg); }
+				}
+				
+				.animate-fly-across { animation: fly-across 4s linear; }
+				.animate-float { animation: float 7s ease-in-out infinite; }
+				.animate-float-delayed { animation: float 7s ease-in-out infinite 2s; }
+				.animate-float-slow { animation: float 10s ease-in-out infinite 4s; }
+				.animate-gradient-x { 
+					background-size: 400% 400%;
+					animation: gradient-x 8s ease infinite; 
+				}
+				.animate-slide-down { animation: slide-down 0.8s ease-out; }
+				.animate-slide-in-left { animation: slide-in-left 1s ease-out 0.2s both; }
+				.animate-slide-in-right { animation: slide-in-right 1s ease-out 0.4s both; }
+				.animate-fade-in-up { animation: fade-in-up 1s ease-out; }
+				.animate-bounce-in { animation: bounce-in 0.8s ease-out; }
+				.animate-text-dance { animation: text-dance 2s ease-in-out infinite; }
+				.animate-icon-bounce { animation: icon-bounce 2s ease-in-out infinite; }
+				.animate-card-float { animation: card-float 3s ease-in-out infinite; }
+				.animate-button-glow { animation: button-glow 2s ease-in-out infinite; }
+				.animate-ring { animation: ring 1s ease-in-out infinite; }
+				.animate-spin-slow { animation: spin 3s linear infinite; }
+				.animate-type-writer { animation: fade-in-up 1s ease-out; }
+				.animate-fade-in { animation: fade-in-up 1s ease-out; }
+				
+				.animation-delay-100 { animation-delay: 0.1s; }
+				.animation-delay-200 { animation-delay: 0.2s; }
+				.animation-delay-300 { animation-delay: 0.3s; }
+				.animation-delay-400 { animation-delay: 0.4s; }
+				.animation-delay-500 { animation-delay: 0.5s; }
+				.animation-delay-600 { animation-delay: 0.6s; }
+			`}</style>
+		</>
 	);
 };
