@@ -1,5 +1,6 @@
 // hooks/useEmailMutation.ts - Complete Email Mutation Hook
 import { useState } from "react";
+require("dotenv").config(); // Ensure environment variables are loaded
 import type { ApiResponse, ContactFormData } from "../components/Contact";
 
 export const useEmailMutation = () => {
@@ -15,9 +16,14 @@ export const useEmailMutation = () => {
 		setData(null);
 
 		try {
+			// In your React components
+			const API_BASE_URL =
+				process.env.NODE_ENV === "production"
+					? "https://your-app-name.vercel.app/api"
+					: "http://localhost:3001/api";
 			// API URL - always use localhost for development
 			const apiUrl = "http://localhost:3001/api/send-email";
-			console.log("📡 Making request to:", apiUrl);
+			console.log("📡 Making request to:", API_BASE_URL);
 
 			const response = await fetch(apiUrl, {
 				method: "POST",

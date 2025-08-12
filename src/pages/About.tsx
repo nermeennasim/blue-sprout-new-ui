@@ -338,6 +338,7 @@
 import React from "react";
 import Section from "../components/Section";
 import { DiagonalFlowAboutSection } from "../components/about/DiagonalFlowAboutSection";
+import { useNavigate } from "react-router-dom";
 
 interface AboutProps {
 	isDark: boolean;
@@ -388,6 +389,16 @@ const DiagonalFlowStyles = `
 `;
 
 const About: React.FC<AboutProps> = ({ isDark }) => {
+	const navigate = useNavigate();
+
+	// Function to handle calendar open
+	const handleCalendarOpen = () => {
+		// Navigate to the calendar page
+		navigate("/contact");
+		setTimeout(() => {
+			window.scrollTo({ top: 0, behavior: "smooth" });
+		}, 100);
+	};
 	return (
 		<>
 			{/* Add styles for Diagonal Flow */}
@@ -627,6 +638,7 @@ const About: React.FC<AboutProps> = ({ isDark }) => {
 						specific workflows and challenges.
 					</p>
 					<button
+						onClick={handleCalendarOpen}
 						className={`px-8 py-3 rounded-full font-semibold transition-all duration-300 transform hover:scale-105 ${
 							isDark
 								? "bg-gradient-to-r from-purple-600 to-blue-600 text-white hover:from-purple-700 hover:to-blue-700"
@@ -644,33 +656,3 @@ const About: React.FC<AboutProps> = ({ isDark }) => {
 };
 
 export default About;
-
-// OLD CODE - COMMENTED OUT FOR REFERENCE
-/*
-// pages/About.tsx - Original version
-import React from "react";
-import Section from "../components/Section";
-import { AboutSection } from "../components/about/AboutSection";
-
-interface AboutProps {
-	isDark: boolean;
-}
-
-const About: React.FC<AboutProps> = ({ isDark }) => {
-	return (
-		<Section id="about-page" className="pt-32 pb-20">
-			<div className="text-center mb-16">
-				<h1 className="text-4xl font-bold mb-8">About Blue Sprout Agency</h1>
-				<p className="text-lg max-w-4xl mx-auto">
-					We are a team of creatives and developers helping small businesses
-					grow their digital presence through modern, user-friendly solutions.
-				</p>
-			</div>
-
-			<AboutSection isDark={isDark} />
-		</Section>
-	);
-};
-
-export default About;
-*/

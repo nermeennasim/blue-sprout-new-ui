@@ -1,9 +1,9 @@
-// backend/server.js
+// backend/server.js - Updated for Vercel
 require('dotenv').config();
 
 console.log('🔧 Environment variables loaded:');
 console.log('- NODE_ENV:', process.env.NODE_ENV || 'development');
-console.log('- PORT:', process.env.PORT || 3001);
+console.log('- VERCEL:', process.env.VERCEL || 'false');
 console.log('- RESEND_API_KEY exists:', !!process.env.RESEND_API_KEY);
 console.log('- FROM_EMAIL:', process.env.FROM_EMAIL);
 console.log('- TO_EMAIL:', process.env.TO_EMAIL);
@@ -15,14 +15,16 @@ const emailRoutes = require('./routes/email');
 const app = express();
 const PORT = process.env.PORT || 3001;
 
-// CORS Configuration
+// CORS Configuration - Updated for Vercel
 app.use(cors({
   origin: [
     'http://localhost:5173', // Vite dev server
     'http://localhost:3000', // Alternative React dev server
-    'https://bluesproutagency.com', // Production domain
-    'https://www.bluesproutagency.com' // Production www domain
-  ],
+    'https://bluesproutagency.com', // Your future domain
+    'https://www.bluesproutagency.com',
+    'https://*.vercel.app', // All Vercel domains
+    process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : null
+  ].filter(Boolean),
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization'],
   credentials: true
@@ -41,15 +43,16 @@ app.use((req, res, next) => {
   next();
 });
 
-// Routes
+// Routes - Map to /api prefix
 app.use('/api', emailRoutes);
 
 // Health check endpoint
-app.get('/health', (req, res) => {
+app.get('/api/health', (req, res) => {
   res.json({ 
     status: 'OK', 
     timestamp: new Date().toISOString(),
-    port: PORT,
+    environment: process.env.NODE_ENV || 'development',
+    vercel: !!process.env.VERCEL,
     envLoaded: !!process.env.RESEND_API_KEY,
     fromEmail: process.env.FROM_EMAIL,
     toEmail: process.env.TO_EMAIL
@@ -61,7 +64,12 @@ app.use('*', (req, res) => {
   res.status(404).json({ 
     error: 'Route not found',
     path: req.path,
-    method: req.method
+    method: req.method,
+    availableRoutes: [
+      'GET /api/health',
+      'POST /api/send-email',
+      'GET /api/test'
+    ]
   });
 });
 
@@ -74,12 +82,17 @@ app.use((error, req, res, next) => {
   });
 });
 
-// Start server
-app.listen(PORT, () => {
-  console.log(`🚀 Backend server running on http://localhost:${PORT}`);
-  console.log(`📧 Email API endpoint: http://localhost:${PORT}/api/send-email`);
-  console.log(`🔍 Health check: http://localhost:${PORT}/health`);
-  console.log(`⚙️ Environment: ${process.env.NODE_ENV || 'development'}`);
-});
+// For Vercel, export the app instead of listening
+if (process.env.VERCEL) {
+  module.exports = app;
+} else {
+  // Local development
+  app.listen(PORT, () => {
+    console.log(`🚀 Backend server running on http://localhost:${PORT}`);
+    console.log(`📧 Email API endpoint: http://localhost:${PORT}/api/send-email`);
+    console.log(`🔍 Health check: http://localhost:${PORT}/api/health`);
+    console.log(`⚙️ Environment: ${process.env.NODE_ENV || 'development'}`);
+  });
+}
 
 module.exports = app;
