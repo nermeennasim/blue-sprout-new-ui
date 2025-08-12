@@ -1,4 +1,4 @@
-// backend/services/emailService.js - COMPLETE WORKING VERSION
+// backend/services/emailService.js - FIXED EMAIL ROUTING
 const { Resend } = require("resend");
 
 class EmailService {
@@ -6,13 +6,15 @@ class EmailService {
     console.log("🚀 Initializing EmailService...");
     
     this.resend = new Resend(process.env.RESEND_API_KEY);
-    this.businessEmail = "support@bluesproutagency.com"; // Your verified email
-    this.businessName = "Blue Sprout Agency";
+    this.businessEmail = process.env.FROM_EMAIL || "support@bluesproutagency.com"; // Your verified email
+    this.businessName = process.env.BUSINESS_NAME || "Blue Sprout Agency LLC";
+    this.toEmail = process.env.TO_EMAIL || "support@bluesproutagency.com"; // Where business notifications go
     
     console.log("✅ EmailService initialized:", {
       hasApiKey: !!process.env.RESEND_API_KEY,
       businessEmail: this.businessEmail,
-      businessName: this.businessName
+      businessName: this.businessName,
+      toEmail: this.toEmail
     });
   }
 
@@ -119,6 +121,7 @@ class EmailService {
   async sendContactFormEmail(formData) {
     try {
       console.log('📧 Processing contact form submission...');
+      console.log('📧 Form data received:', formData);
       
       const { name, email, message, phone, subject } = formData;
 
@@ -145,18 +148,23 @@ class EmailService {
 
       console.log('✅ Validation passed, sending emails...');
 
-      // EMAIL 1: Send notification to business
+      // ✅ EMAIL 1: Send notification TO BUSINESS (support@bluesproutagency.com)
       const businessEmailData = {
-        from: this.businessEmail,
-		//to: 'fahad.m.nasim@gmail.com',
-        to: email,
-        //reply_to: email, // Customer's email for easy replies
-        reply_to: 'nimmi24.1990@gmail.com',
-		subject: `New Contact Form Submission from ${sanitizedName}`,
+        from: this.businessEmail, // FROM: support@bluesproutagency.com
+        to: this.toEmail,         // TO: support@bluesproutagency.com (business receives notification)
+        reply_to: email,          // REPLY-TO: customer's email (so you can reply directly)
+        subject: `New Contact Form Submission from ${sanitizedName}`,
         html: this.generateBusinessEmailHTML(sanitizedName, email, sanitizedMessage, sanitizedPhone, sanitizedSubject)
       };
 
-      console.log('📤 Sending business notification...');
+      console.log('📤 Sending business notification TO:', this.toEmail);
+      console.log('📤 Business email data:', {
+        from: businessEmailData.from,
+        to: businessEmailData.to,
+        reply_to: businessEmailData.reply_to,
+        subject: businessEmailData.subject
+      });
+
       const businessResult = await this.resend.emails.send(businessEmailData);
 
       if (businessResult.error) {
@@ -167,25 +175,32 @@ class EmailService {
         };
       }
 
-      console.log('✅ Business notification sent:', businessResult.data?.id);
+      console.log('✅ Business notification sent to', this.toEmail, '- ID:', businessResult.data?.id);
 
-      // EMAIL 2: Send confirmation to customer
+      // ✅ EMAIL 2: Send confirmation TO CUSTOMER (customer's email address)
       const customerEmailData = {
-        from: this.businessEmail,
-        to: [email],
-        reply_to: this.businessEmail,
+        from: this.businessEmail,  // FROM: support@bluesproutagency.com
+        to: email,                 // TO: customer's email (they get confirmation)
+        reply_to: this.businessEmail, // REPLY-TO: support@bluesproutagency.com
         subject: `Thank you for contacting ${this.businessName}`,
         html: this.generateCustomerEmailHTML(sanitizedName, sanitizedMessage)
       };
 
-      console.log('📤 Sending customer confirmation...');
+      console.log('📤 Sending customer confirmation TO:', email);
+      console.log('📤 Customer email data:', {
+        from: customerEmailData.from,
+        to: customerEmailData.to,
+        reply_to: customerEmailData.reply_to,
+        subject: customerEmailData.subject
+      });
+
       const customerResult = await this.resend.emails.send(customerEmailData);
 
       if (customerResult.error) {
         console.warn('⚠️ Customer confirmation failed:', customerResult.error);
         // Don't fail the request if confirmation fails
       } else {
-        console.log('✅ Customer confirmation sent:', customerResult.data?.id);
+        console.log('✅ Customer confirmation sent to', email, '- ID:', customerResult.data?.id);
       }
 
       return {
@@ -212,7 +227,8 @@ class EmailService {
       configured: !!process.env.RESEND_API_KEY,
       hasApiKey: !!process.env.RESEND_API_KEY,
       businessEmail: this.businessEmail,
-      businessName: this.businessName
+      businessName: this.businessName,
+      toEmail: this.toEmail
     };
 
     console.log("📊 Configuration result:", result);

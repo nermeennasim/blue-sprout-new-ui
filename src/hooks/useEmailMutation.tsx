@@ -1,89 +1,83 @@
-// hooks/useEmailMutation.ts - Complete Email Mutation Hook
+// hooks/useEmailMutation.tsx - Updated to work with your Contact form
 import { useState } from "react";
-require("dotenv").config(); // Ensure environment variables are loaded
-import type { ApiResponse, ContactFormData } from "../components/Contact";
+
+export interface ContactFormData {
+	name: string;
+	email: string;
+	phone: string;
+	message: string;
+}
+
+export interface ApiResponse {
+	success?: boolean;
+	message?: string;
+	error?: string;
+	id?: string;
+}
 
 export const useEmailMutation = () => {
 	const [isLoading, setIsLoading] = useState(false);
+	const [isError, setIsError] = useState(false);
 	const [error, setError] = useState<string | null>(null);
 	const [data, setData] = useState<ApiResponse | null>(null);
 
-	const mutate = async (cformData: ContactFormData): Promise<ApiResponse> => {
-		console.log("🚀 Starting email mutation with data:", cformData);
+	const API_URL = import.meta.env.VITE_API_URL || "http://localhost:3001";
 
+	const sendEmail = async (formData: ContactFormData): Promise<ApiResponse> => {
 		setIsLoading(true);
+		setIsError(false);
 		setError(null);
 		setData(null);
 
 		try {
-			// In your React components
-			const API_BASE_URL =
-				process.env.NODE_ENV === "production"
-					? "https://your-app-name.vercel.app/api"
-					: "http://localhost:3001/api";
-			// API URL - always use localhost for development
-			const apiUrl = "http://localhost:3001/api/send-email";
-			console.log("📡 Making request to:", API_BASE_URL);
+			console.log("📧 Sending email via API:", `${API_URL}/api/send-email`);
 
-			const response = await fetch(apiUrl, {
+			const response = await fetch(`${API_URL}/api/send-email`, {
 				method: "POST",
 				headers: {
 					"Content-Type": "application/json",
 				},
-				body: JSON.stringify(cformData),
+				body: JSON.stringify(formData),
 			});
 
-			console.log("📥 Response status:", response.status);
-			console.log("📥 Response ok:", response.ok);
-
 			const result: ApiResponse = await response.json();
-			console.log("📥 Parsed response data:", result);
 
-			if (!response.ok) {
+			console.log("📬 API Response:", result);
+
+			if (!response.ok || !result.success) {
 				throw new Error(
-					result.error || `HTTP error! status: ${response.status}`
+					result.error || `HTTP ${response.status}: Failed to send email`
 				);
 			}
 
-			console.log("✅ Email sent successfully:", result);
 			setData(result);
 			return result;
 		} catch (err) {
-			console.error("❌ Email mutation error:", err);
+			const errorMessage =
+				err instanceof Error ? err.message : "Network error occurred";
+			console.error("❌ Email API Error:", errorMessage);
 
-			let errorMessage: string;
-
-			if (err instanceof TypeError && err.message.includes("fetch")) {
-				errorMessage =
-					"Cannot connect to server. Please check if the backend is running on port 3001.";
-			} else if (err instanceof Error) {
-				errorMessage = err.message;
-			} else {
-				errorMessage = "Network error occurred";
-			}
-
-			console.error("❌ Final error message:", errorMessage);
+			setIsError(true);
 			setError(errorMessage);
-			throw new Error(errorMessage);
+			throw err;
 		} finally {
 			setIsLoading(false);
 		}
 	};
 
 	const reset = () => {
-		console.log("🔄 Resetting email mutation state");
+		setIsError(false);
 		setError(null);
 		setData(null);
 		setIsLoading(false);
 	};
 
 	return {
-		mutate,
+		sendEmail, // ✅ This is what your Contact form will use
 		isLoading,
+		isError,
 		error,
 		data,
 		reset,
-		isSuccess: !!data?.success,
-		isError: !!error,
 	};
 };

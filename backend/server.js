@@ -2,11 +2,10 @@
 require('dotenv').config();
 
 console.log('🔧 Environment variables loaded:');
-console.log('- NODE_ENV:', process.env.NODE_ENV || 'development');
+console.log('- NODE_ENV:', process.env.NODE_ENV || 'production');
 console.log('- VERCEL:', process.env.VERCEL || 'false');
 console.log('- RESEND_API_KEY exists:', !!process.env.RESEND_API_KEY);
 console.log('- FROM_EMAIL:', process.env.FROM_EMAIL);
-console.log('- TO_EMAIL:', process.env.TO_EMAIL);
 
 const express = require('express');
 const cors = require('cors');
@@ -51,7 +50,7 @@ app.get('/api/health', (req, res) => {
   res.json({ 
     status: 'OK', 
     timestamp: new Date().toISOString(),
-    environment: process.env.NODE_ENV || 'development',
+    environment: process.env.NODE_ENV || 'production',
     vercel: !!process.env.VERCEL,
     envLoaded: !!process.env.RESEND_API_KEY,
     fromEmail: process.env.FROM_EMAIL,
@@ -78,7 +77,7 @@ app.use((error, req, res, next) => {
   console.error('Server Error:', error);
   res.status(500).json({ 
     error: 'Internal server error',
-    message: process.env.NODE_ENV === 'development' ? error.message : 'Something went wrong'
+    message: process.env.NODE_ENV === 'production' ? error.message : 'Something went wrong'
   });
 });
 

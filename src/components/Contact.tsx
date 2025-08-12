@@ -1,4 +1,4 @@
-// components/Contact.tsx - Complete Original Contact Form
+// components/Contact.tsx - Complete Fixed Contact Form
 import React, { useState, useEffect } from "react";
 import { InputField } from "./InputField";
 import { FormField } from "./FormField";
@@ -106,6 +106,7 @@ export const Contact: React.FC<ContactProps> = ({ isDark }) => {
 		}
 	};
 
+	// ✅ FIXED: Updated handleSubmit function
 	const handleSubmit = async (e: React.FormEvent) => {
 		e.preventDefault();
 
@@ -124,7 +125,9 @@ export const Contact: React.FC<ContactProps> = ({ isDark }) => {
 
 		try {
 			console.log("🚀 Submitting form data:", contactFormData);
-			const result = await emailMutation.mutate(contactFormData);
+
+			// ✅ FIXED: Use sendEmail instead of mutate
+			const result = await emailMutation.sendEmail(contactFormData);
 			console.log("✅ Email sent successfully:", result);
 
 			// Show confirmation and reset form
