@@ -1,0 +1,11 @@
+https://blue-sprout-agency-backend.vercel.app/api/health
+
+Health Check: https://blue-sprout-agency-backend.vercel.app/api/health
+Email Test: https://blue-sprout-agency-backend.vercel.app/api/test
+Root: https://blue-sprout-agency-backend.vercel.app/
+
+
+www.bluesproutagency.com
++2
+blue-sprout-agency-2-git-main-nermeennasims-projects.vercel.app
+blue-sprout-agency-2-2sib8mp01-nermeennasims-projects.vercel.app
