@@ -306,7 +306,7 @@ export const Contact: React.FC<ContactProps> = ({ isDark }) => {
 
 					<form onSubmit={handleSubmit} className="space-y-6">
 						<div className="grid md:grid-cols-2 gap-6">
-							<FormField label="Name" htmlFor="name" isDark={isDark}>
+							<FormField label="Name*" htmlFor="name" isDark={isDark}>
 								<InputField
 									type="text"
 									name="name"
@@ -319,7 +319,7 @@ export const Contact: React.FC<ContactProps> = ({ isDark }) => {
 								/>
 							</FormField>
 
-							<FormField label="Email" htmlFor="email" isDark={isDark}>
+							<FormField label="Email*" htmlFor="email" isDark={isDark}>
 								<InputField
 									type="email"
 									name="email"
@@ -333,7 +333,7 @@ export const Contact: React.FC<ContactProps> = ({ isDark }) => {
 							</FormField>
 						</div>
 
-						<FormField label="Phone (Optional)" htmlFor="phone" isDark={isDark}>
+						<FormField label="Phone" htmlFor="phone" isDark={isDark}>
 							<InputField
 								type="tel"
 								name="phone"
@@ -345,7 +345,7 @@ export const Contact: React.FC<ContactProps> = ({ isDark }) => {
 							/>
 						</FormField>
 
-						<FormField label="Message" htmlFor="message" isDark={isDark}>
+						<FormField label="Message*" htmlFor="message" isDark={isDark}>
 							<textarea
 								id="message"
 								name="message"
