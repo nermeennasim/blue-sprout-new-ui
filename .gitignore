@@ -13,6 +13,12 @@ dist-ssr
 *.local
 .env
 .env.local
+dns-settings.txt
+links for backend.txt
+.vscode-test
+googled0b5cae9a60478dd.html
+reusable_about_page_content.txt
+.env.example
 
 # Editor directories and files
 .vscode/*

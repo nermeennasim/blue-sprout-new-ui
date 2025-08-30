@@ -1,5 +1,5 @@
 // App.tsx
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import { Navbar } from "./components/Navbar";
 import { Footer } from "./components/Footer";
@@ -14,10 +14,31 @@ import Contact from "./pages/Contact";
 import Clients from "./pages/Clients";
 import NotFound from "./pages/NotFound";
 
+declare global {
+	interface Window {
+		dataLayer: any[];
+	}
+}
 const App = () => {
 	const [isDark, setIsDark] = useState(false);
 
 	const toggleTheme = () => setIsDark(!isDark);
+
+	useEffect(() => {
+		const script = document.createElement("script");
+		script.async = true;
+		script.src = `https://www.googletagmanager.com/gtag/js?id=${
+			import.meta.env.VITE_GA_MEASUREMENT_ID
+		}`;
+		document.head.appendChild(script);
+
+		window.dataLayer = window.dataLayer || [];
+		function gtag(...args: any[]) {
+			(window.dataLayer as any).push(args);
+		}
+		gtag("js", new Date());
+		gtag("config", import.meta.env.VITE_GA_MEASUREMENT_ID);
+	}, []);
 
 	return (
 		<Router>
