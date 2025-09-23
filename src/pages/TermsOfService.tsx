@@ -5,7 +5,7 @@ import { useTheme } from "../context/ThemeContext";
 import { useNavigate } from "react-router-dom";
 
 const TermsOfService: React.FC = () => {
-	const { theme, isDark } = useTheme();
+	const { theme } = useTheme();
 	const navigate = useNavigate();
 
 	const handleNavigation = (path: string) => {

@@ -9,7 +9,6 @@ import {
 	FaPalette,
 	FaRocket,
 	FaMobile,
-	FaShoppingCart,
 	FaSearch,
 	FaChartLine,
 	FaShieldAlt,

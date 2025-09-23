@@ -3,12 +3,6 @@ import React from "react";
 import { Link } from "react-router-dom";
 import { HeroStructured1 } from "../components/Hero";
 import {
-	FaCode,
-	FaMobile,
-	FaChartLine,
-	FaShieldAlt,
-	FaClock,
-	FaUsers,
 	FaLaptopCode,
 	FaSearch,
 	FaPalette,

@@ -9,9 +9,6 @@ import {
 	FaCloud,
 	FaMobile,
 	FaUser,
-	FaChartLine,
-	FaCogs,
-	FaGlobe,
 	FaRocket,
 	FaPhone,
 	FaEnvelope,
@@ -160,7 +157,7 @@ const industryStats = [
 
 const Clients: React.FC = () => {
 	const navigate = useNavigate();
-	const { theme, isDark } = useTheme();
+	const { theme } = useTheme();
 
 	const handleContactNavigation = () => {
 		navigate("/contact");

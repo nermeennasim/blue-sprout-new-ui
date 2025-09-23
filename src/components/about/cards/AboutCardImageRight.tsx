@@ -21,7 +21,6 @@ export const AboutCardImageRight: React.FC<AboutCardImageRightProps> = ({
 	imageCaption,
 	highlights = [],
 	accentColor = "primary",
-	isDark = false,
 }) => {
 	const { theme } = useTheme();
 

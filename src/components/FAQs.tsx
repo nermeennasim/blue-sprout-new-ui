@@ -249,7 +249,7 @@ const FAQSection: React.FC<{
 };
 
 export const FAQ: React.FC = () => {
-	const { theme, isDark } = useTheme();
+	const { theme } = useTheme();
 	const [openItems, setOpenItems] = useState<Set<string>>(new Set());
 	const [searchTerm, setSearchTerm] = useState("");
 
