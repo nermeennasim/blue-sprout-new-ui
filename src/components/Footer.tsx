@@ -162,7 +162,7 @@ export const Footer: React.FC = () => {
 									//{ name: "Portfolio", path: "/portfolio" },
 									{ name: "Our Clients", path: "/clients" },
 									{ name: "Testimonials", path: "/testimonials" },
-									{ name: "FAQs", path: "/faq" },
+									{ name: "FAQs", path: "/faqs" },
 									{ name: "Contact", path: "/contact" },
 								].map((link, index) => (
 									<li key={index}>
