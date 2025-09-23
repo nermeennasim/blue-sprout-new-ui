@@ -1,14 +1,12 @@
-// pages/NotFound.tsx - Custom 404 Page
+// pages/NotFound.tsx - Fixed with Theme Context
 import React, { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import Section from "../components/Section";
+import { useTheme } from "../context/ThemeContext";
 
-interface NotFoundProps {
-	isDark: boolean;
-}
-
-const NotFound: React.FC<NotFoundProps> = ({ isDark }) => {
+const NotFound: React.FC = () => {
 	const navigate = useNavigate();
+	const { theme, isDark } = useTheme();
 	const [countdown, setCountdown] = useState(10);
 	const [isFloating, setIsFloating] = useState(false);
 
@@ -50,21 +48,24 @@ const NotFound: React.FC<NotFoundProps> = ({ isDark }) => {
 			className="pt-32 pb-20 min-h-screen flex items-center">
 			{/* Background Elements */}
 			<div className="absolute inset-0 overflow-hidden pointer-events-none">
-				{/* Animated Background Shapes */}
 				<div
-					className={`absolute top-20 left-10 w-32 h-32 rounded-full ${
-						isDark ? "bg-purple-500/10" : "bg-purple-200/30"
-					} blur-xl animate-pulse`}></div>
+					className="absolute top-20 left-10 w-32 h-32 rounded-full blur-xl animate-pulse"
+					style={{ backgroundColor: `${theme.primary}20` }}
+				/>
 				<div
-					className={`absolute top-40 right-20 w-24 h-24 rounded-full ${
-						isDark ? "bg-blue-500/10" : "bg-blue-200/30"
-					} blur-xl animate-pulse`}
-					style={{ animationDelay: "1s" }}></div>
+					className="absolute top-40 right-20 w-24 h-24 rounded-full blur-xl animate-pulse"
+					style={{
+						backgroundColor: `${theme.secondary}20`,
+						animationDelay: "1s",
+					}}
+				/>
 				<div
-					className={`absolute bottom-20 left-1/4 w-40 h-40 rounded-full ${
-						isDark ? "bg-green-500/10" : "bg-green-200/30"
-					} blur-xl animate-pulse`}
-					style={{ animationDelay: "2s" }}></div>
+					className="absolute bottom-20 left-1/4 w-40 h-40 rounded-full blur-xl animate-pulse"
+					style={{
+						backgroundColor: `${theme.success}20`,
+						animationDelay: "2s",
+					}}
+				/>
 			</div>
 
 			<div className="relative w-full max-w-6xl mx-auto text-center px-6">
@@ -74,11 +75,13 @@ const NotFound: React.FC<NotFoundProps> = ({ isDark }) => {
 						isFloating ? "translate-y-[-10px]" : "translate-y-[10px]"
 					}`}>
 					<h1
-						className={`text-8xl md:text-9xl font-bold ${
-							isDark
-								? "bg-gradient-to-r from-purple-400 via-blue-400 to-green-400 bg-clip-text text-transparent"
-								: "bg-gradient-to-r from-purple-600 via-blue-600 to-green-600 bg-clip-text text-transparent"
-						} mb-4`}>
+						className="text-8xl md:text-9xl font-bold mb-4"
+						style={{
+							background: `linear-gradient(45deg, ${theme.primary}, ${theme.accent}, ${theme.success})`,
+							WebkitBackgroundClip: "text",
+							WebkitTextFillColor: "transparent",
+							backgroundClip: "text",
+						}}>
 						404
 					</h1>
 
@@ -108,15 +111,13 @@ const NotFound: React.FC<NotFoundProps> = ({ isDark }) => {
 				{/* Main Message */}
 				<div className="mb-12">
 					<h2
-						className={`text-3xl md:text-4xl font-bold mb-6 ${
-							isDark ? "text-white" : "text-gray-900"
-						}`}>
+						className="text-3xl md:text-4xl font-bold mb-6"
+						style={{ color: theme.text }}>
 						Oops! This Page Got Lost in the Digital Garden
 					</h2>
 					<p
-						className={`text-lg md:text-xl max-w-3xl mx-auto leading-relaxed mb-6 ${
-							isDark ? "text-gray-300" : "text-gray-700"
-						}`}>
+						className="text-lg md:text-xl max-w-3xl mx-auto leading-relaxed mb-6"
+						style={{ color: theme.textSecondary }}>
 						Don't worry - even the best websites have pages that sprout in
 						unexpected places! Let's get you back to where the business magic
 						happens.
@@ -124,11 +125,12 @@ const NotFound: React.FC<NotFoundProps> = ({ isDark }) => {
 
 					{/* Fun Error Messages */}
 					<div
-						className={`inline-block px-6 py-3 rounded-full mb-8 ${
-							isDark
-								? "bg-orange-900/30 border border-orange-700 text-orange-300"
-								: "bg-orange-100 border border-orange-200 text-orange-700"
-						}`}>
+						className="inline-block px-6 py-3 rounded-full mb-8 border"
+						style={{
+							backgroundColor: `${theme.warning}20`,
+							borderColor: theme.warning,
+							color: isDark ? theme.warning : "#d97706",
+						}}>
 						<span className="text-sm font-medium">
 							🔍 The page you're looking for might have been moved, deleted, or
 							is taking a coffee break
@@ -141,47 +143,55 @@ const NotFound: React.FC<NotFoundProps> = ({ isDark }) => {
 					{/* Home Card */}
 					<Link to="/" className="group">
 						<div
-							className={`p-6 rounded-3xl border-2 border-dashed transition-all duration-300 group-hover:border-solid group-hover:scale-105 ${
-								isDark
-									? "border-gray-600 hover:border-purple-500 hover:bg-purple-900/20"
-									: "border-gray-300 hover:border-purple-500 hover:bg-purple-50"
-							}`}>
+							className="p-6 rounded-3xl border-2 border-dashed transition-all duration-300 group-hover:border-solid group-hover:scale-105"
+							style={{
+								borderColor: theme.border,
+								backgroundColor: `${theme.primary}10`,
+							}}
+							onMouseEnter={(e) => {
+								e.currentTarget.style.borderColor = theme.primary;
+								e.currentTarget.style.backgroundColor = `${theme.primary}20`;
+							}}
+							onMouseLeave={(e) => {
+								e.currentTarget.style.borderColor = theme.border;
+								e.currentTarget.style.backgroundColor = `${theme.primary}10`;
+							}}>
 							<div className="text-4xl mb-4">🏠</div>
 							<h3
-								className={`text-lg font-bold mb-2 ${
-									isDark ? "text-white" : "text-gray-900"
-								}`}>
+								className="text-lg font-bold mb-2"
+								style={{ color: theme.text }}>
 								Go Home
 							</h3>
-							<p
-								className={`text-sm ${
-									isDark ? "text-gray-400" : "text-gray-600"
-								}`}>
+							<p className="text-sm" style={{ color: theme.textSecondary }}>
 								Back to our main page where all the good stuff lives
 							</p>
 						</div>
 					</Link>
 
 					{/* Services Card */}
-					<Link to="/about" className="group">
+					<Link to="/services" className="group">
 						<div
-							className={`p-6 rounded-3xl border-2 border-dashed transition-all duration-300 group-hover:border-solid group-hover:scale-105 ${
-								isDark
-									? "border-gray-600 hover:border-blue-500 hover:bg-blue-900/20"
-									: "border-gray-300 hover:border-blue-500 hover:bg-blue-50"
-							}`}>
+							className="p-6 rounded-3xl border-2 border-dashed transition-all duration-300 group-hover:border-solid group-hover:scale-105"
+							style={{
+								borderColor: theme.border,
+								backgroundColor: `${theme.secondary}10`,
+							}}
+							onMouseEnter={(e) => {
+								e.currentTarget.style.borderColor = theme.secondary;
+								e.currentTarget.style.backgroundColor = `${theme.secondary}20`;
+							}}
+							onMouseLeave={(e) => {
+								e.currentTarget.style.borderColor = theme.border;
+								e.currentTarget.style.backgroundColor = `${theme.secondary}10`;
+							}}>
 							<div className="text-4xl mb-4">💼</div>
 							<h3
-								className={`text-lg font-bold mb-2 ${
-									isDark ? "text-white" : "text-gray-900"
-								}`}>
+								className="text-lg font-bold mb-2"
+								style={{ color: theme.text }}>
 								Our Services
 							</h3>
-							<p
-								className={`text-sm ${
-									isDark ? "text-gray-400" : "text-gray-600"
-								}`}>
-								See how we help businesses automate and grow
+							<p className="text-sm" style={{ color: theme.textSecondary }}>
+								See how we help businesses grow and thrive
 							</p>
 						</div>
 					</Link>
@@ -189,23 +199,27 @@ const NotFound: React.FC<NotFoundProps> = ({ isDark }) => {
 					{/* Contact Card */}
 					<Link to="/contact" className="group">
 						<div
-							className={`p-6 rounded-3xl border-2 border-dashed transition-all duration-300 group-hover:border-solid group-hover:scale-105 ${
-								isDark
-									? "border-gray-600 hover:border-green-500 hover:bg-green-900/20"
-									: "border-gray-300 hover:border-green-500 hover:bg-green-50"
-							}`}>
+							className="p-6 rounded-3xl border-2 border-dashed transition-all duration-300 group-hover:border-solid group-hover:scale-105"
+							style={{
+								borderColor: theme.border,
+								backgroundColor: `${theme.success}10`,
+							}}
+							onMouseEnter={(e) => {
+								e.currentTarget.style.borderColor = theme.success;
+								e.currentTarget.style.backgroundColor = `${theme.success}20`;
+							}}
+							onMouseLeave={(e) => {
+								e.currentTarget.style.borderColor = theme.border;
+								e.currentTarget.style.backgroundColor = `${theme.success}10`;
+							}}>
 							<div className="text-4xl mb-4">📞</div>
 							<h3
-								className={`text-lg font-bold mb-2 ${
-									isDark ? "text-white" : "text-gray-900"
-								}`}>
+								className="text-lg font-bold mb-2"
+								style={{ color: theme.text }}>
 								Get In Touch
 							</h3>
-							<p
-								className={`text-sm ${
-									isDark ? "text-gray-400" : "text-gray-600"
-								}`}>
-								Let's discuss your automation needs
+							<p className="text-sm" style={{ color: theme.textSecondary }}>
+								Let's discuss your business needs
 							</p>
 						</div>
 					</Link>
@@ -215,65 +229,77 @@ const NotFound: React.FC<NotFoundProps> = ({ isDark }) => {
 				<div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-12">
 					<button
 						onClick={handleGoHome}
-						className={`px-8 py-3 rounded-full font-semibold transition-all duration-300 transform hover:scale-105 ${
-							isDark
-								? "bg-gradient-to-r from-purple-600 to-blue-600 text-white hover:from-purple-700 hover:to-blue-700"
-								: "bg-gradient-to-r from-purple-600 to-blue-600 text-white hover:from-purple-700 hover:to-blue-700"
-						} shadow-lg hover:shadow-xl`}>
+						className="px-8 py-3 rounded-full font-semibold transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl text-white"
+						style={{
+							background: `linear-gradient(45deg, ${theme.primary}, ${theme.accent})`,
+						}}>
 						🏠 Take Me Home
 					</button>
 
 					<button
 						onClick={handleScheduleCall}
-						className={`px-8 py-3 rounded-full font-semibold border-2 transition-all duration-300 ${
-							isDark
-								? "border-gray-600 text-gray-300 hover:border-gray-400 hover:text-white"
-								: "border-gray-300 text-gray-700 hover:border-gray-500 hover:text-gray-900"
-						}`}>
+						className="px-8 py-3 rounded-full font-semibold border-2 transition-all duration-300"
+						style={{
+							borderColor: theme.border,
+							color: theme.text,
+						}}
+						onMouseEnter={(e) => {
+							e.currentTarget.style.borderColor = theme.primary;
+							e.currentTarget.style.color = theme.primary;
+						}}
+						onMouseLeave={(e) => {
+							e.currentTarget.style.borderColor = theme.border;
+							e.currentTarget.style.color = theme.text;
+						}}>
 						📅 Schedule a Call Instead
 					</button>
 				</div>
 
 				{/* Auto-redirect Notice */}
 				<div
-					className={`p-4 rounded-xl ${
-						isDark
-							? "bg-gray-800/50 border border-gray-700"
-							: "bg-gray-100 border border-gray-200"
-					} max-w-md mx-auto`}>
+					className="p-4 rounded-xl max-w-md mx-auto border"
+					style={{
+						backgroundColor: `${theme.surface}f0`,
+						borderColor: theme.border,
+					}}>
 					<div className="flex items-center justify-center space-x-2 mb-2">
 						<div
-							className={`w-3 h-3 rounded-full animate-pulse ${
-								isDark ? "bg-blue-400" : "bg-blue-500"
-							}`}></div>
-						<span
-							className={`text-sm font-medium ${
-								isDark ? "text-gray-300" : "text-gray-700"
-							}`}>
+							className="w-3 h-3 rounded-full animate-pulse"
+							style={{ backgroundColor: theme.primary }}
+						/>
+						<span className="text-sm font-medium" style={{ color: theme.text }}>
 							Auto-redirecting to home page
 						</span>
 					</div>
-					<div
-						className={`text-2xl font-bold ${
-							isDark ? "text-blue-400" : "text-blue-600"
-						}`}>
+					<div className="text-2xl font-bold" style={{ color: theme.primary }}>
 						{countdown}
 					</div>
-					<div
-						className={`text-xs ${isDark ? "text-gray-500" : "text-gray-500"}`}>
+					<div className="text-xs" style={{ color: theme.textSecondary }}>
 						seconds remaining
 					</div>
 				</div>
 
 				{/* Contact Info */}
 				<div className="mt-12 text-sm opacity-75">
-					<p className={isDark ? "text-gray-400" : "text-gray-600"}>
+					<p style={{ color: theme.textSecondary }}>
 						Still can't find what you're looking for?
 					</p>
-					<div className="mt-2 space-x-4">
-						<span>📧 hello@bluesproutagency.com</span>
+					<div
+						className="mt-2 space-x-4"
+						style={{ color: theme.textSecondary }}>
+						<a
+							href="mailto:support@bluesproutagency.com"
+							className="hover:underline"
+							style={{ color: theme.primary }}>
+							📧 support@bluesproutagency.com
+						</a>
 						<span>•</span>
-						<span>📞 (909) 555-0123</span>
+						<a
+							href="tel:+16572174737"
+							className="hover:underline"
+							style={{ color: theme.primary }}>
+							📞 (657) 217-4737
+						</a>
 					</div>
 				</div>
 			</div>
@@ -307,63 +333,3 @@ const NotFound: React.FC<NotFoundProps> = ({ isDark }) => {
 };
 
 export default NotFound;
-
-// App.tsx - Add this route to your router
-/*
-import NotFound from './pages/NotFound';
-
-// In your Routes:
-<Routes>
-	<Route path="/" element={<Home isDark={isDark} />} />
-	<Route path="/about" element={<About isDark={isDark} />} />
-	<Route path="/clients" element={<Clients isDark={isDark} />} />
-	<Route path="/contact" element={<Contact isDark={isDark} />} />
-	
-	// Add the 404 route - MUST be last
-	<Route path="*" element={<NotFound isDark={isDark} />} />
-</Routes>
-*/
-
-// Alternative: Simpler 404 Component
-export const Simple404: React.FC<{ isDark: boolean }> = ({ isDark }) => {
-	const navigate = useNavigate();
-
-	return (
-		<div
-			className={`min-h-screen flex items-center justify-center px-6 ${
-				isDark ? "bg-gray-900" : "bg-gray-50"
-			}`}>
-			<div className="text-center">
-				<h1
-					className={`text-6xl font-bold mb-4 ${
-						isDark
-							? "bg-gradient-to-r from-purple-400 to-blue-400 bg-clip-text text-transparent"
-							: "bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent"
-					}`}>
-					404
-				</h1>
-				<h2
-					className={`text-2xl font-bold mb-4 ${
-						isDark ? "text-white" : "text-gray-900"
-					}`}>
-					Page Not Found
-				</h2>
-				<p
-					className={`text-lg mb-8 ${
-						isDark ? "text-gray-300" : "text-gray-700"
-					}`}>
-					The page you're looking for doesn't exist.
-				</p>
-				<button
-					onClick={() => navigate("/")}
-					className={`px-8 py-3 rounded-full font-semibold transition-all duration-300 ${
-						isDark
-							? "bg-gradient-to-r from-purple-600 to-blue-600 text-white hover:from-purple-700 hover:to-blue-700"
-							: "bg-gradient-to-r from-purple-600 to-blue-600 text-white hover:from-purple-700 hover:to-blue-700"
-					} shadow-lg hover:shadow-xl`}>
-					Go Home
-				</button>
-			</div>
-		</div>
-	);
-};

@@ -7,8 +7,13 @@ interface ScrollAnimatedSectionProps {
 	className?: string;
 	title?: string;
 	subtitle?: string;
-	isDark?: boolean;
-	animationType?: "fade-up" | "slide-left" | "slide-right" | "dance" | "bounce";
+	animationType?:
+		| "fade-up"
+		| "slide-left"
+		| "slide-right"
+		| "dance"
+		| "bounce"
+		| "slide-up";
 }
 
 export const ScrollAnimatedSection: React.FC<ScrollAnimatedSectionProps> = ({
@@ -17,7 +22,7 @@ export const ScrollAnimatedSection: React.FC<ScrollAnimatedSectionProps> = ({
 	className = "",
 	title,
 	subtitle,
-	isDark = false,
+	// isDark = false,
 	animationType = "fade-up",
 }) => {
 	const [isVisible, setIsVisible] = useState(false);
@@ -86,9 +91,7 @@ export const ScrollAnimatedSection: React.FC<ScrollAnimatedSectionProps> = ({
 						<div className="text-center mb-16">
 							{title && (
 								<h2
-									className={`text-3xl md:text-4xl lg:text-5xl font-bold mb-6 transition-all duration-1000 delay-200 ${
-										isDark ? "text-white" : "text-gray-900"
-									} ${getTitleAnimationClass()}`}>
+									className={`text-3xl md:text-4xl lg:text-5xl font-bold mb-6 transition-all duration-1000 delay-200 ${getTitleAnimationClass()}`}>
 									{title.split(" ").map((word, index) => (
 										<span
 											key={index}
@@ -105,9 +108,8 @@ export const ScrollAnimatedSection: React.FC<ScrollAnimatedSectionProps> = ({
 							)}
 							{subtitle && (
 								<p
-									className={`text-lg md:text-xl max-w-3xl mx-auto transition-all duration-1000 delay-500 ${
-										isDark ? "text-gray-300" : "text-gray-600"
-									} ${getSubtitleAnimationClass()}`}>
+									className={`text-lg md:text-xl max-w-3xl mx-auto transition-all duration-1000 delay-500 
+									 ${getSubtitleAnimationClass()}`}>
 									{subtitle}
 								</p>
 							)}

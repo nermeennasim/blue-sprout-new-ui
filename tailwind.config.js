@@ -3,7 +3,13 @@ export default {
 	content: ["./index.html", "./src/**/*.{js,ts,jsx,tsx}"],
 	darkMode: "class",
 	theme: {
-		extend: {},
+		extend: {
+			fontFamily: {
+				heading: ["Poppins", "system-ui", "sans-serif"],
+				body: ["Inter", "system-ui", "sans-serif"],
+				display: ["Poppins", "system-ui", "sans-serif"],
+			},
+		},
 	},
 
 	darkMode: "class",

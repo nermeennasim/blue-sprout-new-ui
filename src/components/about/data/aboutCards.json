@@ -1,0 +1,31 @@
+
+
+[
+  {
+    "title": "Tell Us What You Do",
+    "description": "Share your current workflows, daily challenges, and business goals. We listen, ask questions, and **understand what makes your business unique**. Every business operates differently - we take time to learn your specific processes, pain points, and growth objectives before proposing any solutions.",
+    "imageUrl": "https://images.unsplash.com/photo-1522071820081-009f0129c71c?w=600&h=600&fit=crop",
+    "imageAlt": "Business consultation and discovery meeting",
+    "imageCaption": "Step 1: Discovery",
+    "highlights": ["Business Analysis", "Workflow Mapping", "Goal Understanding", "Process Discovery"],
+    "accentColor": "primary"
+  },
+  {
+    "title": "We Build Your Solution",
+    "description": "Our team designs and develops **custom web platforms, automation systems, and growth tools** designed specifically for how you operate. From UI/UX design to working dashboards, payment systems to content management - we build complete solutions that fit your exact business needs.",
+    "imageUrl": "https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=600&h=600&fit=crop&crop=focalpoint&fp-x=0.6&fp-y=0.4",
+    "imageAlt": "Development team building custom business solutions",
+    "imageCaption": "Step 2: Build & Automate",
+    "highlights": ["Custom Development", "Business Automation", "End-to-End Solutions", "Seamless Integration"],
+    "accentColor": "accent"
+  },
+  {
+    "title": "You Focus on Growth",
+    "description": "Watch your business run smoother, save time on repetitive tasks, and **focus on growth while your systems work 24/7**. Our clients consistently see improved efficiency, increased engagement, and measurable business growth that shows up in their analytics and bottom line.",
+    "imageUrl": "https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=600&h=500&fit=crop",
+    "imageAlt": "Business owner enjoying growth and success from automated systems",
+    "imageCaption": "Step 3: Growth & Results",
+    "highlights": ["24/7 Operations", "Time Savings", "Measurable Growth", "Focus on Core Business"],
+    "accentColor": "success"
+  }
+]

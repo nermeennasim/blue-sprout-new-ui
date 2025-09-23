@@ -1,14 +1,16 @@
-// pages/Contact.tsx
+// pages/Contact.tsx - Updated with Theme Context
+import React from "react";
 import { Contact as ContactComponent } from "../components/Contact";
+import { useTheme } from "../context/ThemeContext";
 
-interface ContactPageProps {
-	isDark: boolean;
-}
+const Contact: React.FC = () => {
+	const { theme } = useTheme();
 
-const Contact: React.FC<ContactPageProps> = ({ isDark }) => {
 	return (
-		<div className="pt-32">
-			<ContactComponent isDark={isDark} />
+		<div
+			className="pt-32 min-h-screen"
+			style={{ backgroundColor: theme.background }}>
+			<ContactComponent />
 		</div>
 	);
 };

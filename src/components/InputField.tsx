@@ -1,4 +1,6 @@
+// components/InputField.tsx - Updated with Theme Context
 import React from "react";
+import { useTheme } from "../context/ThemeContext";
 
 interface InputFieldProps {
 	label: string;
@@ -8,7 +10,6 @@ interface InputFieldProps {
 	onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
 	required?: boolean;
 	placeholder?: string;
-	isDark?: boolean;
 	pattern?: string;
 	inputMode?: React.HTMLAttributes<HTMLInputElement>["inputMode"];
 	maxLength?: number;
@@ -22,18 +23,18 @@ export const InputField: React.FC<InputFieldProps> = ({
 	onChange,
 	required = true,
 	placeholder,
-	isDark = false,
 	pattern,
 	inputMode = "text",
 	maxLength,
 }) => {
+	const { theme } = useTheme();
+
 	return (
 		<div className="flex flex-col gap-2">
 			<label
 				htmlFor={name}
-				className={`font-semibold ${
-					isDark ? "text-gray-300" : "text-gray-800"
-				}`}>
+				className="font-semibold"
+				style={{ color: theme.text }}>
 				{label}
 			</label>
 			<input
@@ -47,13 +48,20 @@ export const InputField: React.FC<InputFieldProps> = ({
 				pattern={pattern}
 				inputMode={inputMode}
 				maxLength={maxLength}
-				className={`p-3 border rounded-lg w-full transition-colors ${
-					isDark
-						? "bg-gray-700 border-gray-600 text-white placeholder-gray-400 focus:border-orange-500"
-						: "bg-gray-50 border-gray-300 text-gray-900 placeholder-gray-500 focus:border-teal-500"
-				} focus:outline-none focus:ring-2 focus:ring-opacity-20 ${
-					isDark ? "focus:ring-orange-500" : "focus:ring-teal-500"
-				}`}
+				className="p-3 border rounded-lg w-full transition-colors focus:outline-none focus:ring-2 focus:ring-opacity-20"
+				style={{
+					backgroundColor: theme.surface,
+					borderColor: theme.border,
+					color: theme.text,
+				}}
+				onFocus={(e) => {
+					e.target.style.borderColor = theme.primary;
+					e.target.style.boxShadow = `0 0 0 3px ${theme.primary}20`;
+				}}
+				onBlur={(e) => {
+					e.target.style.borderColor = theme.border;
+					e.target.style.boxShadow = "none";
+				}}
 			/>
 		</div>
 	);

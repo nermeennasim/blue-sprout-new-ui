@@ -1,12 +1,9 @@
-// components/Contact.tsx - Complete Fixed Contact Form
+// components/Contact.tsx - Updated with Theme Context
 import React, { useState, useEffect } from "react";
 import { InputField } from "./InputField";
 import { FormField } from "./FormField";
 import { useEmailMutation } from "../hooks/useEmailMutation";
-
-export interface ContactProps {
-	isDark: boolean;
-}
+import { useTheme } from "../context/ThemeContext";
 
 // Add Calendly type declaration
 declare global {
@@ -29,7 +26,8 @@ export interface ApiResponse {
 	id?: string;
 }
 
-export const Contact: React.FC<ContactProps> = ({ isDark }) => {
+export const Contact: React.FC = () => {
+	const { theme } = useTheme();
 	const [contactFormData, setContactFormData] = useState<ContactFormData>({
 		name: "",
 		email: "",
@@ -60,9 +58,9 @@ export const Contact: React.FC<ContactProps> = ({ isDark }) => {
 				window.Calendly.initBadgeWidget({
 					url: "https://calendly.com/bluesproutagency/30min",
 					text: "📅 Schedule Free Call",
-					color: isDark ? "#f97316" : "#0d9488", // Orange for dark, teal for light
+					color: theme.primary,
 					textColor: "#ffffff",
-					branding: false, // Remove "powered by Calendly"
+					branding: false,
 				});
 			}
 		};
@@ -83,7 +81,7 @@ export const Contact: React.FC<ContactProps> = ({ isDark }) => {
 			const badgeWidget = document.querySelector(".calendly-badge-widget");
 			if (badgeWidget) badgeWidget.remove();
 		};
-	}, [isDark]);
+	}, [theme.primary]);
 
 	// Form validation
 	const isFormValid =
@@ -106,7 +104,6 @@ export const Contact: React.FC<ContactProps> = ({ isDark }) => {
 		}
 	};
 
-	// ✅ FIXED: Updated handleSubmit function
 	const handleSubmit = async (e: React.FormEvent) => {
 		e.preventDefault();
 
@@ -126,7 +123,6 @@ export const Contact: React.FC<ContactProps> = ({ isDark }) => {
 		try {
 			console.log("🚀 Submitting form data:", contactFormData);
 
-			// ✅ FIXED: Use sendEmail instead of mutate
 			const result = await emailMutation.sendEmail(contactFormData);
 			console.log("✅ Email sent successfully:", result);
 
@@ -140,7 +136,6 @@ export const Contact: React.FC<ContactProps> = ({ isDark }) => {
 			});
 		} catch (error) {
 			console.error("❌ Email submission failed:", error);
-			// Error is already handled by the mutation hook
 		}
 	};
 
@@ -153,36 +148,43 @@ export const Contact: React.FC<ContactProps> = ({ isDark }) => {
 	if (showConfirmation) {
 		return (
 			<section
-				className={`py-20 px-6 ${isDark ? "bg-gray-900" : "bg-gray-50"}`}>
+				className="py-20 px-6"
+				style={{ backgroundColor: theme.surface }}>
 				<div className="max-w-2xl mx-auto text-center">
 					<div
-						className={`p-8 rounded-xl ${
-							isDark ? "bg-gray-800" : "bg-white"
-						} shadow-lg`}>
+						className="p-8 rounded-xl shadow-lg border"
+						style={{
+							backgroundColor: theme.background,
+							borderColor: theme.border,
+						}}>
 						<div className="text-6xl mb-4">✅</div>
-						<h2 className="text-2xl font-bold mb-4">Message Sent!</h2>
-						<p className={`mb-6 ${isDark ? "text-gray-300" : "text-gray-600"}`}>
+						<h2
+							className="text-2xl font-bold mb-4"
+							style={{ color: theme.text }}>
+							Message Sent!
+						</h2>
+						<p className="mb-6" style={{ color: theme.textSecondary }}>
 							We'll get back to you within 24 hours.
 						</p>
 
 						{emailMutation.data?.id && (
 							<p
-								className={`text-sm mb-4 ${
-									isDark ? "text-gray-400" : "text-gray-500"
-								}`}>
+								className="text-sm mb-4"
+								style={{ color: theme.textSecondary }}>
 								Reference ID: {emailMutation.data.id}
 							</p>
 						)}
 
 						<div className="space-y-4 mb-6">
-							<p className={isDark ? "text-gray-300" : "text-gray-600"}>
+							<p style={{ color: theme.textSecondary }}>
 								📧 Check your email for a confirmation message
 							</p>
-							<p className={isDark ? "text-gray-300" : "text-gray-600"}>
+							<p style={{ color: theme.textSecondary }}>
 								Need immediate assistance? Call us at{" "}
 								<a
 									href="tel:+16572174737"
-									className="text-blue-500 underline font-medium">
+									className="underline font-medium"
+									style={{ color: theme.primary }}>
 									(657) 217-4737
 								</a>
 							</p>
@@ -190,11 +192,8 @@ export const Contact: React.FC<ContactProps> = ({ isDark }) => {
 
 						<button
 							onClick={resetForm}
-							className={`px-6 py-3 rounded-lg font-semibold ${
-								isDark
-									? "bg-orange-500 hover:bg-orange-600"
-									: "bg-teal-600 hover:bg-teal-700"
-							} text-white transition-colors`}>
+							className="px-6 py-3 rounded-lg font-semibold text-white transition-colors"
+							style={{ backgroundColor: theme.primary }}>
 							Send Another Message
 						</button>
 					</div>
@@ -204,12 +203,16 @@ export const Contact: React.FC<ContactProps> = ({ isDark }) => {
 	}
 
 	return (
-		<section className={`py-20 px-6 ${isDark ? "bg-gray-900" : "bg-gray-50"}`}>
+		<section className="py-20 px-6" style={{ backgroundColor: theme.surface }}>
 			<div className="max-w-4xl mx-auto">
-				{/* Development Banner - Show when form is under development */}
+				{/* Development Banner */}
 				{isFormUnderDevelopment && (
 					<div className="text-center mb-8">
-						<div className="inline-flex items-center px-6 py-3 bg-gradient-to-r from-yellow-500 to-orange-500 text-white rounded-full font-bold shadow-lg text-sm md:text-base mb-4">
+						<div
+							className="inline-flex items-center px-6 py-3 text-white rounded-full font-bold shadow-lg text-sm md:text-base mb-4"
+							style={{
+								background: `linear-gradient(45deg, ${theme.warning}, ${theme.error})`,
+							}}>
 							🚧 Contact Form Under Development - Use Schedule Button or Call
 							Direct!
 						</div>
@@ -218,35 +221,31 @@ export const Contact: React.FC<ContactProps> = ({ isDark }) => {
 
 				{/* Header */}
 				<div className="text-center mb-12">
-					<h2
-						className={`text-3xl font-bold mb-4 ${
-							isDark ? "text-white" : "text-gray-800"
-						}`}>
+					<h2 className="text-3xl font-bold mb-4" style={{ color: theme.text }}>
 						Get In Touch
 					</h2>
-					<p
-						className={`text-lg mb-6 ${
-							isDark ? "text-gray-300" : "text-gray-600"
-						}`}>
+					<p className="text-lg mb-6" style={{ color: theme.textSecondary }}>
 						Ready to grow your business? Send us a message or schedule a free
 						consultation.
 					</p>
 
 					{/* Quick Contact Info */}
 					<div className="space-y-2 mb-8">
-						<p className={isDark ? "text-gray-300" : "text-gray-600"}>
+						<p style={{ color: theme.textSecondary }}>
 							📞{" "}
 							<a
 								href="tel:+16572174737"
-								className="text-blue-500 hover:text-blue-600 font-semibold">
+								className="font-semibold hover:underline"
+								style={{ color: theme.primary }}>
 								(657) 217-4737
 							</a>
 						</p>
-						<p className={isDark ? "text-gray-300" : "text-gray-600"}>
+						<p style={{ color: theme.textSecondary }}>
 							📧{" "}
 							<a
 								href="mailto:support@bluesproutagency.com"
-								className="text-blue-500 hover:text-blue-600">
+								className="hover:underline"
+								style={{ color: theme.primary }}>
 								support@bluesproutagency.com
 							</a>
 						</p>
@@ -254,10 +253,7 @@ export const Contact: React.FC<ContactProps> = ({ isDark }) => {
 
 					{/* Popup Schedule Button */}
 					<div className="mb-8">
-						<p
-							className={`text-sm mb-3 ${
-								isDark ? "text-gray-400" : "text-gray-500"
-							}`}>
+						<p className="text-sm mb-3" style={{ color: theme.textSecondary }}>
 							💡 <strong>Tip:</strong> Look for the floating "Schedule Free
 							Call" button to book instantly!
 						</p>
@@ -266,24 +262,28 @@ export const Contact: React.FC<ContactProps> = ({ isDark }) => {
 
 				{/* Contact Form */}
 				<div
-					className={`rounded-xl shadow-lg p-8 max-w-2xl mx-auto ${
-						isDark ? "bg-gray-800" : "bg-white"
-					} ${isFormUnderDevelopment ? "opacity-75" : ""}`}>
+					className={`rounded-xl shadow-lg p-8 max-w-2xl mx-auto border ${
+						isFormUnderDevelopment ? "opacity-75" : ""
+					}`}
+					style={{
+						backgroundColor: theme.background,
+						borderColor: theme.border,
+					}}>
 					<h3
-						className={`text-xl font-semibold mb-6 text-center ${
-							isDark ? "text-white" : "text-gray-800"
-						}`}>
+						className="text-xl font-semibold mb-6 text-center"
+						style={{ color: theme.text }}>
 						Send Us a Message
 					</h3>
 
 					{/* Form status indicator */}
 					{isFormUnderDevelopment && (
 						<div
-							className={`p-4 rounded-lg border-2 border-dashed mb-6 ${
-								isDark
-									? "border-yellow-400 bg-yellow-900/20 text-yellow-200"
-									: "border-yellow-500 bg-yellow-50 text-yellow-700"
-							}`}>
+							className="p-4 rounded-lg border-2 border-dashed mb-6"
+							style={{
+								borderColor: theme.warning,
+								backgroundColor: `${theme.warning}20`,
+								color: theme.warning,
+							}}>
 							<p className="text-center font-medium">
 								⚠️ Form is temporarily disabled while we set up our email
 								service.
@@ -298,7 +298,13 @@ export const Contact: React.FC<ContactProps> = ({ isDark }) => {
 
 					{/* Error Display */}
 					{emailMutation.isError && (
-						<div className="mb-6 p-4 bg-red-100 border border-red-400 text-red-700 rounded-lg">
+						<div
+							className="mb-6 p-4 rounded-lg border"
+							style={{
+								backgroundColor: `${theme.error}20`,
+								borderColor: theme.error,
+								color: theme.error,
+							}}>
 							<p className="font-medium">Message failed to send</p>
 							<p className="text-sm">{emailMutation.error}</p>
 						</div>
@@ -306,46 +312,43 @@ export const Contact: React.FC<ContactProps> = ({ isDark }) => {
 
 					<form onSubmit={handleSubmit} className="space-y-6">
 						<div className="grid md:grid-cols-2 gap-6">
-							<FormField label="Name*" htmlFor="name" isDark={isDark}>
+							<FormField label="Name*" htmlFor="name">
 								<InputField
 									type="text"
 									name="name"
 									value={contactFormData.name}
 									onChange={handleChange}
 									placeholder="Your name"
-									isDark={isDark}
 									label=""
 									required
 								/>
 							</FormField>
 
-							<FormField label="Email*" htmlFor="email" isDark={isDark}>
+							<FormField label="Email*" htmlFor="email">
 								<InputField
 									type="email"
 									name="email"
 									value={contactFormData.email}
 									onChange={handleChange}
 									placeholder="your@email.com"
-									isDark={isDark}
 									label=""
 									required
 								/>
 							</FormField>
 						</div>
 
-						<FormField label="Phone" htmlFor="phone" isDark={isDark}>
+						<FormField label="Phone" htmlFor="phone">
 							<InputField
 								type="tel"
 								name="phone"
 								value={contactFormData.phone}
 								onChange={handleChange}
 								placeholder="(555) 123-4567"
-								isDark={isDark}
 								label=""
 							/>
 						</FormField>
 
-						<FormField label="Message*" htmlFor="message" isDark={isDark}>
+						<FormField label="Message*" htmlFor="message">
 							<textarea
 								id="message"
 								name="message"
@@ -356,18 +359,16 @@ export const Contact: React.FC<ContactProps> = ({ isDark }) => {
 								required
 								rows={4}
 								placeholder="Tell us about your business and how we can help..."
-								className={`p-3 border rounded-lg w-full resize-none transition-colors ${
-									isDark
-										? "bg-gray-700 border-gray-600 text-white focus:border-orange-500"
-										: "bg-gray-50 border-gray-300 text-gray-900 focus:border-teal-500"
-								} focus:outline-none focus:ring-2 focus:ring-opacity-20 ${
-									isDark ? "focus:ring-orange-500" : "focus:ring-teal-500"
-								}`}
+								className="p-3 border rounded-lg w-full resize-none transition-colors focus:outline-none focus:ring-2 focus:ring-opacity-20"
+								style={{
+									backgroundColor: theme.surface,
+									borderColor: theme.border,
+									color: theme.text,
+								}}
 							/>
 							<div
-								className={`text-right text-sm mt-1 ${
-									isDark ? "text-gray-400" : "text-gray-500"
-								}`}>
+								className="text-right text-sm mt-1"
+								style={{ color: theme.textSecondary }}>
 								{contactFormData.message.length}/500
 							</div>
 						</FormField>
@@ -375,13 +376,15 @@ export const Contact: React.FC<ContactProps> = ({ isDark }) => {
 						<button
 							type="submit"
 							disabled={isButtonDisabled}
-							className={`w-full py-3 rounded-lg font-semibold transition-all duration-300 ${
-								isButtonDisabled
-									? "bg-gray-400 cursor-not-allowed text-gray-600"
-									: isDark
-									? "bg-orange-500 text-white hover:bg-orange-600"
-									: "bg-teal-600 text-white hover:bg-teal-700"
-							} transform hover:scale-105`}>
+							className={`w-full py-3 rounded-lg font-semibold transition-all duration-300 transform hover:scale-105 ${
+								isButtonDisabled ? "cursor-not-allowed" : ""
+							}`}
+							style={{
+								backgroundColor: isButtonDisabled
+									? theme.textSecondary
+									: theme.primary,
+								color: isButtonDisabled ? theme.background : "white",
+							}}>
 							{isFormUnderDevelopment ? (
 								"🚧 Form Under Development"
 							) : emailMutation.isLoading ? (
@@ -414,10 +417,7 @@ export const Contact: React.FC<ContactProps> = ({ isDark }) => {
 						{/* Form validation hints */}
 						{!isFormUnderDevelopment && !isFormValid && (
 							<div className="text-center mt-4">
-								<p
-									className={`text-sm ${
-										isDark ? "text-gray-400" : "text-gray-500"
-									}`}>
+								<p className="text-sm" style={{ color: theme.textSecondary }}>
 									Required: Name, Email, Message (minimum 10 characters)
 								</p>
 							</div>
@@ -426,10 +426,7 @@ export const Contact: React.FC<ContactProps> = ({ isDark }) => {
 						{/* Mutation Status Indicators */}
 						<div className="text-center space-y-2">
 							{emailMutation.isLoading && (
-								<p
-									className={`text-sm ${
-										isDark ? "text-gray-300" : "text-gray-600"
-									}`}>
+								<p className="text-sm" style={{ color: theme.textSecondary }}>
 									🚀 Sending your message via email API...
 								</p>
 							)}

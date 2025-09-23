@@ -38,7 +38,7 @@ export const ImpactCard: React.FC<ImpactCardProps> = ({
 				<img
 					src="https://images.unsplash.com/photo-1515378960530-7c0da6231fb1?w=300&h=150&fit=crop&crop=focalpoint&fp-x=0.5&fp-y=0.3"
 					alt="Success and growth"
-					className="w-full h-24 object-cover rounded-lg"
+					className="w-full h-24 object-cover rounded-lg left-10"
 				/>
 				<div
 					className={`text-center mt-1 text-xs ${
