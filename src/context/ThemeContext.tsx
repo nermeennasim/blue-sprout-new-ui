@@ -1,17 +1,17 @@
-// contexts/ThemeContext.tsx - Complete Theme Management System
+// contexts/ThemeContext.tsx - Updated with new dark blue color
 import React, { createContext, useState, useEffect } from "react";
 import type { ReactNode } from "react";
 import { useTheme } from "../hooks/useTheme";
 
-// Theme configuration with your preferred colors
+// Theme configuration with updated dark blue
 const themeConfig = {
 	light: {
-		// Light theme colors
+		// Light theme colors (unchanged)
 		primary: "#29abe2", // Blue
-		secondary: "#262261", // Dark Blue
+		secondary: "#19183B", // Updated Dark Purple-Blue
 		background: "#ffffff", // White
 		surface: "#f8fafc", // Light Gray
-		text: "#262261", // Dark Blue Text
+		text: "#19183B", // Updated Dark Purple-Blue Text
 		textSecondary: "#64748b", // Gray Text
 		border: "#e2e8f0", // Light Border
 		accent: "#29abe2", // Blue Accent
@@ -20,15 +20,15 @@ const themeConfig = {
 		error: "#ef4444", // Red
 	},
 	dark: {
-		// Dark theme colors (Dark Blue based instead of orange/black)
-		primary: "#29abe2", // Blue (same as light)
-		secondary: "#1e1b4b", // Darker Blue
-		background: "#262261", // Dark Blue Background
-		surface: "#1e1b4b", // Darker Blue Surface
+		// Dark theme colors with updated rich purple-blue
+		primary: "#29abe2", // Blue (keeping this)
+		secondary: "#19183B", // Updated: rich dark purple-blue
+		background: "#19183B", // Updated: was #262261, now distinctive purple-blue
+		surface: "#0F0E24", // Updated: darker variation of your new purple-blue
 		text: "#ffffff", // White Text
 		textSecondary: "#cbd5e1", // Light Gray Text
-		border: "#29abe2", // Blue Border
-		accent: "#29abe2", // Blue Accent
+		border: "#29abe2", // Blue Border (keeping the accent blue)
+		accent: "#29abe2", // Blue Accent (keeping this)
 		success: "#34d399", // Light Green
 		warning: "#fbbf24", // Light Yellow
 		error: "#f87171", // Light Red
@@ -65,7 +65,7 @@ export const ThemeProvider: React.FC<ThemeProviderProps> = ({
 	defaultTheme = "dark",
 }) => {
 	const [themeMode, setThemeModeState] = useState<ThemeMode>(() => {
-		// Check localStorage first, then default to light theme
+		// Check localStorage first, then default to dark theme
 		if (typeof window !== "undefined") {
 			const savedTheme = localStorage.getItem("bluesprout-theme") as ThemeMode;
 			return savedTheme || defaultTheme;
@@ -128,7 +128,7 @@ export const useThemeStyles = () => {
 	const { theme, isDark } = useTheme();
 
 	return {
-		// Common style patterns
+		// Common style patterns with updated colors
 		card: `bg-[${theme.surface}] border border-[${theme.border}] rounded-lg shadow-sm`,
 		button: {
 			primary: `bg-[${theme.primary}] text-white hover:bg-[${theme.primary}]/90 transition-all duration-300`,

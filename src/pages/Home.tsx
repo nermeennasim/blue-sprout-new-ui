@@ -159,38 +159,43 @@ const Home: React.FC = () => {
 									))}
 								</div>
 								<blockquote
-									className="text-xl italic mb-6"
+									className="text-lg italic mb-6"
 									style={getTextStyle("secondary")}>
-									"Nermeen, Senior Engineer at Blue Sprout completely automated
-									our event booking system, Scheduling and transformed our web
-									presence. Now clients can book DJ services directly online,
-									and we get automated email notifications instantly. The
-									professional website helped us land bigger events and
-									corporate clients."
+									"Nermeen, at Blue Sprout Agency (Senior Software Engineer) is
+									truly exceptional! She completely transformed the way our
+									business operates. She automated our event booking system and
+									scheduling, making it effortless for our clients to book DJ
+									services directly online. We now receive instant email
+									notifications, which saves us so much time and helps us stay
+									on top of every detail. On top of that, the website she
+									created looks modern, professional, and has elevated our brand
+									presence. Thanks to her expertise, we’ve been able to secure
+									larger events and attract more corporate clients. Nermeen is
+									not only highly skilled but also a pleasure to work with—I’d
+									recommend her to anyone looking to take their business to the
+									next level!"
 								</blockquote>
 							</div>
 							<div className="mb-6">
-								<div className="w-16 h-16 mx-auto mb-4 rounded-full overflow-hidden">
+								<div className="w-16 h-16 mx-auto mb-4 rounded-full overflow-hidden object-center shadow-lg">
 									<img
-										src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&h=150&fit=crop&crop=face"
+										src="/oscar-portfolio-image.jpeg"
 										alt="Oscar Perez - Black Tie Events"
-										className="w-full h-full object-cover"
+										className="w-full h-full object-contain"
 									/>
 								</div>
 								<h4 className="text-lg font-bold" style={getTextStyle()}>
 									Oscar Perez
 								</h4>
 								<p style={getTextStyle("secondary")}>Owner, Black Tie Events</p>
-								<p className="text-sm mt-2" style={getTextStyle("secondary")}>
-									DJ and Event Services
-								</p>
+
 								<a
 									href="https://blktieevents.com"
 									target="_blank"
 									rel="noopener noreferrer"
 									className="text-sm underline hover:no-underline transition-all"
 									style={{ color: theme.primary }}>
-									blktieevents.com
+									https://blktieevents.com
 								</a>
 							</div>
 						</div>

@@ -77,11 +77,11 @@ export const Footer: React.FC = () => {
 							<div className="flex items-center space-x-3 mb-4">
 								<button
 									onClick={() => handleNavigation("/")}
-									className="hover:opacity-80 transition-opacity">
+									className="hover:opacity-80 transition-opacity top-0">
 									<img
 										src={logoSrc}
 										alt="Blue Sprout Agency Logo"
-										className="h-20 w-auto transition-all duration-300 hover:scale-105 object-contain"
+										className="h-20 mt-0 w-auto transition-all duration-300 hover:scale-105 object-contain"
 									/>
 									{/* Fallback text logo */}
 								</button>

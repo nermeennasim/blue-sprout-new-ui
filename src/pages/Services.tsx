@@ -1,4 +1,4 @@
-// pages/Services.tsx - Redesigned with Better Organization and Modern UI
+// pages/Services.tsx - Updated with Realistic Pricing and Package Details
 import React from "react";
 import Section from "../components/Section";
 import { useTheme } from "../context/ThemeContext";
@@ -15,6 +15,9 @@ import {
 	FaBolt,
 	FaPhone,
 	FaEnvelope,
+	FaRobot,
+	FaDatabase,
+	FaCloud,
 } from "react-icons/fa";
 
 const Services: React.FC = () => {
@@ -202,7 +205,9 @@ const Services: React.FC = () => {
 												className="w-2 h-2 rounded-full"
 												style={{ backgroundColor: service.color }}
 											/>
-											<span style={{ color: theme.text }}>{feature}</span>
+											<span className="text-sm" style={{ color: theme.text }}>
+												{feature}
+											</span>
 										</div>
 									))}
 								</div>
@@ -253,11 +258,13 @@ const Services: React.FC = () => {
 										/>
 									</div>
 									<div>
-										<h4 className="font-semibold" style={{ color: theme.text }}>
+										<h4
+											className="font-semibold text-sm"
+											style={{ color: theme.text }}>
 											{service.title}
 										</h4>
 										<p
-											className="text-sm"
+											className="text-xs"
 											style={{ color: theme.textSecondary }}>
 											{service.description}
 										</p>
@@ -279,224 +286,345 @@ const Services: React.FC = () => {
 						Choose Your Package
 					</h2>
 					<p className="text-lg mb-8" style={{ color: theme.textSecondary }}>
-						Custom solutions tailored to your business needs with unlimited
-						revisions included
+						Professional web solutions with transparent pricing and no hidden
+						fees
 					</p>
 
-					<div className="grid md:grid-cols-3 gap-8 max-w-5xl mx-auto">
+					<div className="grid md:grid-cols-3 gap-8 max-w-6xl mx-auto">
+						{/* Starter Package */}
 						<div
-							className="p-8 rounded-2xl border"
+							className="p-8 rounded-2xl border shadow-sm"
 							style={{
 								backgroundColor: theme.background,
 								borderColor: theme.border,
+								textAlign: "left",
 							}}>
-							<h3
-								className="text-xl font-bold mb-4"
-								style={{ color: theme.text }}>
-								Starter Package
-							</h3>
-							<p
-								className="text-sm mb-6"
-								style={{ color: theme.textSecondary }}>
-								Perfect for small businesses and startups
-							</p>
-							<div className="space-y-3 mb-6">
-								<div className="flex items-center gap-3">
-									<div
-										className="w-2 h-2 rounded-full"
-										style={{ backgroundColor: theme.primary }}
-									/>
-									<span className="text-sm" style={{ color: theme.text }}>
-										Landing Page or Small Website
-									</span>
-								</div>
-								<div className="flex items-center gap-3">
-									<div
-										className="w-2 h-2 rounded-full"
-										style={{ backgroundColor: theme.primary }}
-									/>
-									<span className="text-sm" style={{ color: theme.text }}>
-										Mobile Responsive Design
-									</span>
-								</div>
-								<div className="flex items-center gap-3">
-									<div
-										className="w-2 h-2 rounded-full"
-										style={{ backgroundColor: theme.primary }}
-									/>
-									<span className="text-sm" style={{ color: theme.text }}>
-										Basic SEO Setup
-									</span>
-								</div>
-								<div className="flex items-center gap-3">
-									<div
-										className="w-2 h-2 rounded-full"
-										style={{ backgroundColor: theme.primary }}
-									/>
+							<div className="text-center mb-6">
+								<h3
+									className="text-xl font-bold mb-3"
+									style={{ color: theme.text }}>
+									Starter Package
+								</h3>
+								<div className="mb-2">
 									<span
-										className="text-sm font-semibold"
+										className="text-3xl font-bold"
 										style={{ color: theme.primary }}>
-										Unlimited Revisions
+										$799
 									</span>
+									<span className="text-sm text-gray-500 ml-1">one-time</span>
 								</div>
+								<p className="text-sm" style={{ color: theme.textSecondary }}>
+									Perfect for small businesses getting online
+								</p>
 							</div>
+
+							<div className="mb-8">
+								<h4
+									className="text-sm font-semibold mb-3"
+									style={{ color: theme.text }}>
+									What's Included:
+								</h4>
+								<ul className="space-y-2">
+									<li className="text-sm" style={{ color: theme.text }}>
+										Static website (1-5 pages)
+									</li>
+									<li className="text-sm" style={{ color: theme.text }}>
+										Mobile responsive design
+									</li>
+									<li className="text-sm" style={{ color: theme.text }}>
+										Custom theme of your choice
+									</li>
+									<li className="text-sm" style={{ color: theme.text }}>
+										Basic hosting, domain & SEO setup
+									</li>
+									<li
+										className="text-sm font-medium"
+										style={{ color: theme.primary }}>
+										Customized content included
+									</li>
+								</ul>
+							</div>
+
+							<div
+								className="border-t pt-4 mb-6"
+								style={{ borderColor: theme.border }}>
+								<h4
+									className="text-sm font-semibold mb-3"
+									style={{ color: theme.text }}>
+									Monthly Add-ons:
+								</h4>
+								<ul className="space-y-2">
+									<li
+										className="text-sm"
+										style={{ color: theme.textSecondary }}>
+										<span className="font-medium">Social Media Support:</span>{" "}
+										$500/month
+									</li>
+									<li
+										className="text-sm pl-4"
+										style={{ color: theme.textSecondary }}>
+										(1-4 posts, 1-2 reels monthly)
+									</li>
+									<li
+										className="text-sm"
+										style={{ color: theme.textSecondary }}>
+										<span className="font-medium">Logo Design:</span> $250
+										one-time
+									</li>
+								</ul>
+							</div>
+
+							<button
+								className="w-full py-3 px-6 rounded-lg font-semibold transition-all duration-300 border-2 hover:shadow-lg"
+								style={{
+									borderColor: theme.primary,
+									color: theme.primary,
+									backgroundColor: "transparent",
+								}}>
+								Get Started
+							</button>
 						</div>
 
+						{/* Growth Package */}
 						<div
-							className="p-8 rounded-2xl border-2 relative overflow-hidden transform scale-105"
+							className="p-8 rounded-2xl border-2 relative shadow-lg transform scale-105"
 							style={{
 								backgroundColor: theme.surface,
 								borderColor: theme.primary,
+								textAlign: "left",
 							}}>
 							<div
-								className="absolute top-0 right-0 px-4 py-2 text-xs font-semibold text-white"
+								className="absolute -top-3 left-1/2 transform -translate-x-1/2 px-4 py-1 rounded-full text-xs font-semibold text-white"
 								style={{ backgroundColor: theme.primary }}>
 								Most Popular
 							</div>
-							<h3
-								className="text-xl font-bold mb-4"
-								style={{ color: theme.text }}>
-								Growth Package
-							</h3>
-							<p
-								className="text-sm mb-6"
-								style={{ color: theme.textSecondary }}>
-								Complete solution for growing businesses
-							</p>
-							<div className="space-y-3 mb-6">
-								<div className="flex items-center gap-3">
-									<div
-										className="w-2 h-2 rounded-full"
-										style={{ backgroundColor: theme.primary }}
-									/>
-									<span className="text-sm" style={{ color: theme.text }}>
-										Multi-page Website + Blog
-									</span>
-								</div>
-								<div className="flex items-center gap-3">
-									<div
-										className="w-2 h-2 rounded-full"
-										style={{ backgroundColor: theme.primary }}
-									/>
-									<span className="text-sm" style={{ color: theme.text }}>
-										Advanced SEO & Analytics
-									</span>
-								</div>
-								<div className="flex items-center gap-3">
-									<div
-										className="w-2 h-2 rounded-full"
-										style={{ backgroundColor: theme.primary }}
-									/>
-									<span className="text-sm" style={{ color: theme.text }}>
-										Social Media Integration
-									</span>
-								</div>
-								<div className="flex items-center gap-3">
-									<div
-										className="w-2 h-2 rounded-full"
-										style={{ backgroundColor: theme.primary }}
-									/>
-									<span className="text-sm" style={{ color: theme.text }}>
-										Content Management System
-									</span>
-								</div>
-								<div className="flex items-center gap-3">
-									<div
-										className="w-2 h-2 rounded-full"
-										style={{ backgroundColor: theme.primary }}
-									/>
+
+							<div className="text-center mb-6 pt-2">
+								<h3
+									className="text-xl font-bold mb-3"
+									style={{ color: theme.text }}>
+									Growth Package
+								</h3>
+								<div className="mb-2">
 									<span
-										className="text-sm font-semibold"
+										className="text-3xl font-bold"
 										style={{ color: theme.primary }}>
-										Unlimited Revisions
+										$2,500
 									</span>
+									<span className="text-sm text-gray-500 ml-1">starting</span>
+								</div>
+								<p className="text-sm" style={{ color: theme.textSecondary }}>
+									Complete solution for growing businesses
+								</p>
+							</div>
+
+							<div className="mb-8">
+								<h4
+									className="text-sm font-semibold mb-3"
+									style={{ color: theme.text }}>
+									Everything in Starter +
+								</h4>
+								<ul className="space-y-2">
+									<li className="text-sm" style={{ color: theme.text }}>
+										Multi-page website with CMS
+									</li>
+									<li className="text-sm" style={{ color: theme.text }}>
+										User authentication (Google, Facebook login)
+									</li>
+									<li className="text-sm" style={{ color: theme.text }}>
+										Custom dashboard interface
+									</li>
+									<li className="text-sm" style={{ color: theme.text }}>
+										CRUD operations (bookings, products, payments)
+									</li>
+									<li className="text-sm" style={{ color: theme.text }}>
+										Third-party API & database integration
+									</li>
+									<li className="text-sm" style={{ color: theme.text }}>
+										Dual theme support (dark/light mode)
+									</li>
+									<li className="text-sm" style={{ color: theme.text }}>
+										Advanced SEO & analytics setup
+									</li>
+									<li
+										className="text-sm font-medium"
+										style={{ color: theme.primary }}>
+										Automated email workflows
+									</li>
+									<li
+										className="text-sm font-medium"
+										style={{ color: theme.primary }}>
+										Custom domain & email setup
+									</li>
+								</ul>
+							</div>
+
+							<div
+								className="border-t pt-4 mb-6"
+								style={{ borderColor: theme.border }}>
+								<h4
+									className="text-sm font-semibold mb-3"
+									style={{ color: theme.text }}>
+									Ongoing Support:
+								</h4>
+								<div className="text-sm" style={{ color: theme.textSecondary }}>
+									<span className="font-medium">$400/month</span> for 6 months
+								</div>
+								<div
+									className="text-xs mt-1"
+									style={{ color: theme.textSecondary }}>
+									Includes maintenance, updates & technical support
 								</div>
 							</div>
+
+							<button
+								className="w-full py-3 px-6 rounded-lg font-semibold transition-all duration-300 shadow-lg hover:shadow-xl text-white"
+								style={{
+									backgroundColor: theme.primary,
+								}}>
+								Choose Growth
+							</button>
 						</div>
 
+						{/* Enterprise Package */}
 						<div
-							className="p-8 rounded-2xl border"
+							className="p-8 rounded-2xl border shadow-sm"
 							style={{
 								backgroundColor: theme.background,
 								borderColor: theme.border,
+								textAlign: "left",
 							}}>
-							<h3
-								className="text-xl font-bold mb-4"
-								style={{ color: theme.text }}>
-								Enterprise Package
-							</h3>
-							<p
-								className="text-sm mb-6"
-								style={{ color: theme.textSecondary }}>
-								Advanced solutions for established businesses
-							</p>
-							<div className="space-y-3 mb-6">
-								<div className="flex items-center gap-3">
-									<div
-										className="w-2 h-2 rounded-full"
-										style={{ backgroundColor: theme.primary }}
-									/>
-									<span className="text-sm" style={{ color: theme.text }}>
-										Custom Web Application
-									</span>
-								</div>
-								<div className="flex items-center gap-3">
-									<div
-										className="w-2 h-2 rounded-full"
-										style={{ backgroundColor: theme.primary }}
-									/>
-									<span className="text-sm" style={{ color: theme.text }}>
-										E-commerce Integration
-									</span>
-								</div>
-								<div className="flex items-center gap-3">
-									<div
-										className="w-2 h-2 rounded-full"
-										style={{ backgroundColor: theme.primary }}
-									/>
-									<span className="text-sm" style={{ color: theme.text }}>
-										Advanced Features & APIs
-									</span>
-								</div>
-								<div className="flex items-center gap-3">
-									<div
-										className="w-2 h-2 rounded-full"
-										style={{ backgroundColor: theme.primary }}
-									/>
-									<span className="text-sm" style={{ color: theme.text }}>
-										Priority Support
-									</span>
-								</div>
-								<div className="flex items-center gap-3">
-									<div
-										className="w-2 h-2 rounded-full"
-										style={{ backgroundColor: theme.primary }}
-									/>
+							<div className="text-center mb-6">
+								<h3
+									className="text-xl font-bold mb-3"
+									style={{ color: theme.text }}>
+									Enterprise Package
+								</h3>
+								<div className="mb-2">
 									<span
-										className="text-sm font-semibold"
+										className="text-3xl font-bold"
 										style={{ color: theme.primary }}>
-										Unlimited Revisions
+										$6,000
 									</span>
+									<span className="text-sm text-gray-500 ml-1">starting</span>
+								</div>
+								<p className="text-sm" style={{ color: theme.textSecondary }}>
+									Complete business solution with Advanced Features
+								</p>
+							</div>
+
+							<div className="mb-8">
+								<h4
+									className="text-sm font-semibold mb-3"
+									style={{ color: theme.text }}>
+									Everything in Growth +
+								</h4>
+								<ul className="space-y-2">
+									<li className="text-sm" style={{ color: theme.text }}>
+										SaaS cloud-based architecture
+									</li>
+									<li className="text-sm" style={{ color: theme.text }}>
+										Advanced lead capture system
+									</li>
+									<li className="text-sm" style={{ color: theme.text }}>
+										Document integration & external APIs
+									</li>
+									<li className="text-sm" style={{ color: theme.text }}>
+										Enterprise-grade SEO & analytics
+									</li>
+									<li
+										className="text-sm font-medium"
+										style={{ color: theme.primary }}>
+										Unlimited social media content creation
+									</li>
+									<li
+										className="text-sm font-medium"
+										style={{ color: theme.primary }}>
+										Logo design with unlimited revisions
+									</li>
+									<li
+										className="text-sm font-medium"
+										style={{ color: theme.primary }}>
+										Unlimited website modifications
+									</li>
+									<li
+										className="text-sm font-bold"
+										style={{ color: theme.primary }}>
+										AI-powered features & automation
+									</li>
+								</ul>
+							</div>
+
+							<div
+								className="border-t pt-4 mb-6"
+								style={{ borderColor: theme.border }}>
+								<h4
+									className="text-sm font-semibold mb-3"
+									style={{ color: theme.text }}>
+									Lifetime Support:
+								</h4>
+								<div className="text-sm" style={{ color: theme.textSecondary }}>
+									<span className="font-medium">$1,000/month</span> ongoing
+								</div>
+								<div
+									className="text-xs mt-1"
+									style={{ color: theme.textSecondary }}>
+									Includes unlimited support, updates & modifications
 								</div>
 							</div>
+
+							<button
+								className="w-full py-3 px-6 rounded-lg font-semibold transition-all duration-300 border-2 hover:shadow-lg"
+								style={{
+									borderColor: theme.primary,
+									color: theme.primary,
+									backgroundColor: "transparent",
+								}}>
+								Contact Sales
+							</button>
 						</div>
 					</div>
 
-					{/* Special Offer */}
+					{/* AI Enhancement Call-out */}
 					<div
 						className="mt-12 p-6 rounded-2xl border-2"
 						style={{
 							backgroundColor: `${theme.primary}10`,
 							borderColor: theme.primary,
 						}}>
+						<div className="flex items-center justify-center gap-3 mb-3">
+							<FaRobot className="w-6 h-6" style={{ color: theme.primary }} />
+							<h3
+								className="text-2xl font-bold"
+								style={{ color: theme.primary }}>
+								AI Integration Available
+							</h3>
+						</div>
+						<p className="text-lg mb-2" style={{ color: theme.text }}>
+							Add intelligent chatbots, automation workflows, and AI-powered
+							features to any package
+						</p>
+						<p className="text-sm" style={{ color: theme.textSecondary }}>
+							Custom AI solutions available upon request - Let's discuss your
+							specific needs
+						</p>
+					</div>
+
+					{/* Special Offer */}
+					<div
+						className="mt-8 p-6 rounded-2xl border-2"
+						style={{
+							backgroundColor: `linear-gradient(135deg, ${theme.primary}15, ${theme.surface})`,
+							borderColor: theme.accent,
+						}}>
 						<h3
 							className="text-2xl font-bold mb-3"
-							style={{ color: theme.primary }}>
+							style={{ color: theme.accent }}>
 							Special Referral Offer
 						</h3>
 						<p className="text-lg" style={{ color: theme.text }}>
 							Bring a referral and get{" "}
-							<span className="font-bold">50% OFF</span> your package
+							<span className="font-bold">50% OFF</span> your setup fee
 						</p>
 						<p className="text-sm mt-2" style={{ color: theme.textSecondary }}>
 							Both you and your referral benefit from this amazing discount
@@ -512,7 +640,7 @@ const Services: React.FC = () => {
 						borderColor: theme.border,
 					}}>
 					<h2 className="text-4xl font-bold mb-6" style={{ color: theme.text }}>
-						Ready to Transform Your Business?
+						Get Your Free Consultation Now
 					</h2>
 					<p
 						className="text-xl mb-8 max-w-2xl mx-auto"

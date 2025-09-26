@@ -161,7 +161,7 @@ const AppContent = () => {
 // Root App Component with Theme Provider
 export const App = () => {
 	return (
-		<ThemeProvider defaultTheme="dark">
+		<ThemeProvider defaultTheme="light">
 			<AppContent />
 		</ThemeProvider>
 	);
