@@ -15,9 +15,7 @@ import {
 	FaBolt,
 	FaPhone,
 	FaEnvelope,
-	FaRobot,
-	FaDatabase,
-	FaCloud,
+	FaRobot
 } from "react-icons/fa";
 
 const Services: React.FC = () => {
@@ -293,7 +291,7 @@ const Services: React.FC = () => {
 					<div className="grid md:grid-cols-3 gap-8 max-w-6xl mx-auto">
 						{/* Starter Package */}
 						<div
-							className="p-8 rounded-2xl border shadow-sm"
+							className="p-8 rounded-2xl border shadow-sm "
 							style={{
 								backgroundColor: theme.background,
 								borderColor: theme.border,
