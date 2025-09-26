@@ -1,4 +1,4 @@
-// pages/Services.tsx - Updated with Realistic Pricing and Package Details
+// pages/Services.tsx - Refactored with Data Arrays and Professional Icons
 import React from "react";
 import Section from "../components/Section";
 import { useTheme } from "../context/ThemeContext";
@@ -15,12 +15,19 @@ import {
 	FaBolt,
 	FaPhone,
 	FaEnvelope,
-	FaRobot
+	FaRobot,
+	FaCheck,
+	FaCrown,
+	FaGem,
+	FaArrowRight,
 } from "react-icons/fa";
+import { useNavigate } from "react-router-dom";
 
 const Services: React.FC = () => {
 	const { theme } = useTheme();
+	const navigate = useNavigate();
 
+	// Core Services Data
 	const coreServices = [
 		{
 			icon: FaCode,
@@ -92,6 +99,7 @@ const Services: React.FC = () => {
 		},
 	];
 
+	// Additional Services Data
 	const additionalServices = [
 		{
 			icon: FaSearch,
@@ -124,6 +132,252 @@ const Services: React.FC = () => {
 			description: "Reliable hosting solutions",
 		},
 	];
+
+	// Packages Data
+	const packages = [
+		{
+			id: "starter",
+			name: "Starter Package",
+			price: "$799",
+			priceNote: "one-time",
+			description: "Perfect for small businesses getting online",
+			icon: FaCheck,
+			features: [
+				"Static website (1-5 pages)",
+				"Mobile responsive design",
+				"Custom theme of your choice",
+				"Basic hosting, domain & SEO setup",
+				"Customized content included",
+			],
+			highlightedFeatures: ["Customized content included"],
+			addOns: {
+				title: "Monthly Add-ons:",
+				items: [
+					{
+						name: "Social Media Support",
+						price: "$500/month",
+						description: "(1-4 posts, 1-2 reels monthly)",
+					},
+					{
+						name: "Logo Design",
+						price: "$250 one-time",
+						description: null,
+					},
+				],
+			},
+			buttonText: "Get Started",
+			buttonStyle: "outline",
+			popular: false,
+		},
+		{
+			id: "growth",
+			name: "Growth Package",
+			price: "$2,500",
+			priceNote: "starting",
+			description: "Complete solution for growing businesses",
+			features: [
+				"Multi-page website (Optional: with CMS)",
+				"User authentication (Google, Facebook login)",
+				"Custom dashboard interface",
+				"CRUD operations (bookings, products, payments, products, articles,etc)",
+				"Third-party API & database integration",
+				"Dual theme support (dark/light mode)",
+				"Advanced SEO & analytics setup",
+				"Automated email workflows",
+				"Custom domain & email setup",
+			],
+			highlightedFeatures: [
+				"Automated email workflows",
+				"Custom domain & email setup",
+			],
+			addOns: {
+				title: "Ongoing Support:",
+				items: [
+					{
+						name: "$600/month for 6 months",
+						price: null,
+						description: "Includes maintenance, updates & technical support",
+					},
+				],
+			},
+			buttonText: "Choose Growth",
+			buttonStyle: "filled",
+			popular: true,
+		},
+		{
+			id: "enterprise",
+			name: "Enterprise Package",
+			price: "$6,000",
+			priceNote: "starting",
+			description: "Complete business solution with Advanced Features",
+			icon: FaCrown,
+			features: [
+				"SaaS cloud-based architecture",
+				"Advanced lead capture system",
+				"Document integration & external APIs",
+				"Enterprise-grade SEO & analytics",
+				"Unlimited social media content creation",
+				"Logo design with unlimited revisions",
+				"Unlimited website modifications",
+				"AI-powered features & automation",
+			],
+			highlightedFeatures: [
+				"Unlimited social media content creation",
+				"Logo design with unlimited revisions",
+				"Unlimited website modifications",
+				"AI-powered features & automation",
+			],
+			addOns: {
+				title: "Lifetime Support:",
+				items: [
+					{
+						name: "$1,000/month ongoing",
+						price: null,
+						description: "Includes unlimited support, updates & modifications",
+					},
+				],
+			},
+			buttonText: "Contact Sales",
+			buttonStyle: "outline",
+			popular: false,
+		},
+	];
+
+	// Render Package Card Component
+	const renderPackageCard = (pkg: (typeof packages)[0]) => {
+		const isPopular = pkg.popular;
+
+		return (
+			<div
+				key={pkg.id}
+				className={`p-8 rounded-2xl border shadow-sm relative ${
+					isPopular ? "border-2 shadow-lg transform scale-105" : ""
+				}`}
+				style={{
+					backgroundColor: isPopular ? theme.surface : theme.background,
+					borderColor: isPopular ? theme.primary : theme.border,
+					textAlign: "left",
+				}}>
+				{/* Popular Badge */}
+				{isPopular && (
+					<div
+						className="absolute -top-3 left-1/2 transform -translate-x-1/2 px-4 py-1 rounded-full text-xs font-semibold text-white"
+						style={{ backgroundColor: theme.primary }}>
+						Most Popular
+					</div>
+				)}
+
+				{/* Header */}
+				<div
+					className="text-center mb-6"
+					style={{ paddingTop: isPopular ? "8px" : "0" }}>
+					<h3 className="text-xl font-bold mb-3" style={{ color: theme.text }}>
+						{pkg.name}
+					</h3>
+					<div className="mb-2">
+						<span
+							className="text-3xl font-bold"
+							style={{ color: theme.primary }}>
+							{pkg.price}
+						</span>
+						<span className="text-sm text-gray-500 ml-1">{pkg.priceNote}</span>
+					</div>
+					<p className="text-sm" style={{ color: theme.textSecondary }}>
+						{pkg.description}
+					</p>
+				</div>
+
+				{/* Features */}
+				<div className="mb-8">
+					<h4
+						className="text-sm font-semibold mb-3"
+						style={{ color: theme.text }}>
+						{pkg.id === "starter"
+							? "What's Included:"
+							: `Everything in ${pkg.id === "growth" ? "Starter" : "Growth"} +`}
+					</h4>
+					<ul className="space-y-3">
+						{pkg.features.map((feature, index) => {
+							const isHighlighted = pkg.highlightedFeatures.includes(feature);
+							return (
+								<li key={index} className="flex items-start gap-3">
+									<FaArrowRight
+										className="w-4 h-4 mt-0.5 flex-shrink-0"
+										style={{
+											color: isHighlighted ? theme.primary : theme.text,
+										}}
+									/>
+									<span
+										className={`text-sm ${isHighlighted ? "font-medium" : ""}`}
+										style={{
+											color: isHighlighted ? theme.primary : theme.text,
+										}}>
+										{feature}
+									</span>
+								</li>
+							);
+						})}
+					</ul>
+				</div>
+
+				{/* Add-ons / Support */}
+				<div
+					className="border-t pt-4 mb-6"
+					style={{ borderColor: theme.border }}>
+					<h4
+						className="text-sm font-semibold mb-3"
+						style={{ color: theme.text }}>
+						{pkg.addOns.title}
+					</h4>
+					<ul className="space-y-2">
+						{pkg.addOns.items.map((item, index) => (
+							<li key={index}>
+								<div className="text-sm" style={{ color: theme.textSecondary }}>
+									{item.price ? (
+										<>
+											<span className="font-medium">{item.name}:</span>{" "}
+											{item.price}
+										</>
+									) : (
+										<span className="font-medium">{item.name}</span>
+									)}
+								</div>
+								{item.description && (
+									<div
+										className="text-xs mt-1"
+										style={{ color: theme.textSecondary }}>
+										{item.description}
+									</div>
+								)}
+							</li>
+						))}
+					</ul>
+				</div>
+
+				{/* Button */}
+				<button
+					onClick={() => navigate("/contact")}
+					className={`w-full py-3 px-6 rounded-lg font-semibold transition-all duration-300 ${
+						pkg.buttonStyle === "filled"
+							? "shadow-lg hover:shadow-xl text-white"
+							: "border-2 hover:shadow-lg"
+					}`}
+					style={
+						pkg.buttonStyle === "filled"
+							? {
+									backgroundColor: theme.primary,
+							  }
+							: {
+									borderColor: theme.primary,
+									color: theme.primary,
+									backgroundColor: "transparent",
+							  }
+					}>
+					{pkg.buttonText}
+				</button>
+			</div>
+		);
+	};
 
 	return (
 		<Section id="services-page" className="pt-32 pb-20">
@@ -199,9 +453,9 @@ const Services: React.FC = () => {
 								<div className="space-y-3 mb-8">
 									{service.features.map((feature, featureIndex) => (
 										<div key={featureIndex} className="flex items-center gap-3">
-											<div
-												className="w-2 h-2 rounded-full"
-												style={{ backgroundColor: service.color }}
+											<FaGem
+												className="w-3 h-3"
+												style={{ color: service.color }}
 											/>
 											<span className="text-sm" style={{ color: theme.text }}>
 												{feature}
@@ -212,6 +466,7 @@ const Services: React.FC = () => {
 
 								{/* CTA Button */}
 								<button
+									onClick={() => navigate("/contact")}
 									className="w-full py-4 rounded-xl font-semibold transition-all duration-300 hover:shadow-lg hover:scale-[1.02]"
 									style={{
 										backgroundColor: service.color,
@@ -255,7 +510,7 @@ const Services: React.FC = () => {
 											style={{ color: theme.primary }}
 										/>
 									</div>
-									<div>
+									<div className="flex flex-wrap gap-2">
 										<h4
 											className="font-semibold text-sm"
 											style={{ color: theme.text }}>
@@ -289,298 +544,7 @@ const Services: React.FC = () => {
 					</p>
 
 					<div className="grid md:grid-cols-3 gap-8 max-w-6xl mx-auto">
-						{/* Starter Package */}
-						<div
-							className="p-8 rounded-2xl border shadow-sm "
-							style={{
-								backgroundColor: theme.background,
-								borderColor: theme.border,
-								textAlign: "left",
-							}}>
-							<div className="text-center mb-6">
-								<h3
-									className="text-xl font-bold mb-3"
-									style={{ color: theme.text }}>
-									Starter Package
-								</h3>
-								<div className="mb-2">
-									<span
-										className="text-3xl font-bold"
-										style={{ color: theme.primary }}>
-										$799
-									</span>
-									<span className="text-sm text-gray-500 ml-1">one-time</span>
-								</div>
-								<p className="text-sm" style={{ color: theme.textSecondary }}>
-									Perfect for small businesses getting online
-								</p>
-							</div>
-
-							<div className="mb-8">
-								<h4
-									className="text-sm font-semibold mb-3"
-									style={{ color: theme.text }}>
-									What's Included:
-								</h4>
-								<ul className="space-y-2">
-									<li className="text-sm" style={{ color: theme.text }}>
-										Static website (1-5 pages)
-									</li>
-									<li className="text-sm" style={{ color: theme.text }}>
-										Mobile responsive design
-									</li>
-									<li className="text-sm" style={{ color: theme.text }}>
-										Custom theme of your choice
-									</li>
-									<li className="text-sm" style={{ color: theme.text }}>
-										Basic hosting, domain & SEO setup
-									</li>
-									<li
-										className="text-sm font-medium"
-										style={{ color: theme.primary }}>
-										Customized content included
-									</li>
-								</ul>
-							</div>
-
-							<div
-								className="border-t pt-4 mb-6"
-								style={{ borderColor: theme.border }}>
-								<h4
-									className="text-sm font-semibold mb-3"
-									style={{ color: theme.text }}>
-									Monthly Add-ons:
-								</h4>
-								<ul className="space-y-2">
-									<li
-										className="text-sm"
-										style={{ color: theme.textSecondary }}>
-										<span className="font-medium">Social Media Support:</span>{" "}
-										$500/month
-									</li>
-									<li
-										className="text-sm pl-4"
-										style={{ color: theme.textSecondary }}>
-										(1-4 posts, 1-2 reels monthly)
-									</li>
-									<li
-										className="text-sm"
-										style={{ color: theme.textSecondary }}>
-										<span className="font-medium">Logo Design:</span> $250
-										one-time
-									</li>
-								</ul>
-							</div>
-
-							<button
-								className="w-full py-3 px-6 rounded-lg font-semibold transition-all duration-300 border-2 hover:shadow-lg"
-								style={{
-									borderColor: theme.primary,
-									color: theme.primary,
-									backgroundColor: "transparent",
-								}}>
-								Get Started
-							</button>
-						</div>
-
-						{/* Growth Package */}
-						<div
-							className="p-8 rounded-2xl border-2 relative shadow-lg transform scale-105"
-							style={{
-								backgroundColor: theme.surface,
-								borderColor: theme.primary,
-								textAlign: "left",
-							}}>
-							<div
-								className="absolute -top-3 left-1/2 transform -translate-x-1/2 px-4 py-1 rounded-full text-xs font-semibold text-white"
-								style={{ backgroundColor: theme.primary }}>
-								Most Popular
-							</div>
-
-							<div className="text-center mb-6 pt-2">
-								<h3
-									className="text-xl font-bold mb-3"
-									style={{ color: theme.text }}>
-									Growth Package
-								</h3>
-								<div className="mb-2">
-									<span
-										className="text-3xl font-bold"
-										style={{ color: theme.primary }}>
-										$2,500
-									</span>
-									<span className="text-sm text-gray-500 ml-1">starting</span>
-								</div>
-								<p className="text-sm" style={{ color: theme.textSecondary }}>
-									Complete solution for growing businesses
-								</p>
-							</div>
-
-							<div className="mb-8">
-								<h4
-									className="text-sm font-semibold mb-3"
-									style={{ color: theme.text }}>
-									Everything in Starter +
-								</h4>
-								<ul className="space-y-2">
-									<li className="text-sm" style={{ color: theme.text }}>
-										Multi-page website with CMS
-									</li>
-									<li className="text-sm" style={{ color: theme.text }}>
-										User authentication (Google, Facebook login)
-									</li>
-									<li className="text-sm" style={{ color: theme.text }}>
-										Custom dashboard interface
-									</li>
-									<li className="text-sm" style={{ color: theme.text }}>
-										CRUD operations (bookings, products, payments)
-									</li>
-									<li className="text-sm" style={{ color: theme.text }}>
-										Third-party API & database integration
-									</li>
-									<li className="text-sm" style={{ color: theme.text }}>
-										Dual theme support (dark/light mode)
-									</li>
-									<li className="text-sm" style={{ color: theme.text }}>
-										Advanced SEO & analytics setup
-									</li>
-									<li
-										className="text-sm font-medium"
-										style={{ color: theme.primary }}>
-										Automated email workflows
-									</li>
-									<li
-										className="text-sm font-medium"
-										style={{ color: theme.primary }}>
-										Custom domain & email setup
-									</li>
-								</ul>
-							</div>
-
-							<div
-								className="border-t pt-4 mb-6"
-								style={{ borderColor: theme.border }}>
-								<h4
-									className="text-sm font-semibold mb-3"
-									style={{ color: theme.text }}>
-									Ongoing Support:
-								</h4>
-								<div className="text-sm" style={{ color: theme.textSecondary }}>
-									<span className="font-medium">$400/month</span> for 6 months
-								</div>
-								<div
-									className="text-xs mt-1"
-									style={{ color: theme.textSecondary }}>
-									Includes maintenance, updates & technical support
-								</div>
-							</div>
-
-							<button
-								className="w-full py-3 px-6 rounded-lg font-semibold transition-all duration-300 shadow-lg hover:shadow-xl text-white"
-								style={{
-									backgroundColor: theme.primary,
-								}}>
-								Choose Growth
-							</button>
-						</div>
-
-						{/* Enterprise Package */}
-						<div
-							className="p-8 rounded-2xl border shadow-sm"
-							style={{
-								backgroundColor: theme.background,
-								borderColor: theme.border,
-								textAlign: "left",
-							}}>
-							<div className="text-center mb-6">
-								<h3
-									className="text-xl font-bold mb-3"
-									style={{ color: theme.text }}>
-									Enterprise Package
-								</h3>
-								<div className="mb-2">
-									<span
-										className="text-3xl font-bold"
-										style={{ color: theme.primary }}>
-										$6,000
-									</span>
-									<span className="text-sm text-gray-500 ml-1">starting</span>
-								</div>
-								<p className="text-sm" style={{ color: theme.textSecondary }}>
-									Complete business solution with Advanced Features
-								</p>
-							</div>
-
-							<div className="mb-8">
-								<h4
-									className="text-sm font-semibold mb-3"
-									style={{ color: theme.text }}>
-									Everything in Growth +
-								</h4>
-								<ul className="space-y-2">
-									<li className="text-sm" style={{ color: theme.text }}>
-										SaaS cloud-based architecture
-									</li>
-									<li className="text-sm" style={{ color: theme.text }}>
-										Advanced lead capture system
-									</li>
-									<li className="text-sm" style={{ color: theme.text }}>
-										Document integration & external APIs
-									</li>
-									<li className="text-sm" style={{ color: theme.text }}>
-										Enterprise-grade SEO & analytics
-									</li>
-									<li
-										className="text-sm font-medium"
-										style={{ color: theme.primary }}>
-										Unlimited social media content creation
-									</li>
-									<li
-										className="text-sm font-medium"
-										style={{ color: theme.primary }}>
-										Logo design with unlimited revisions
-									</li>
-									<li
-										className="text-sm font-medium"
-										style={{ color: theme.primary }}>
-										Unlimited website modifications
-									</li>
-									<li
-										className="text-sm font-bold"
-										style={{ color: theme.primary }}>
-										AI-powered features & automation
-									</li>
-								</ul>
-							</div>
-
-							<div
-								className="border-t pt-4 mb-6"
-								style={{ borderColor: theme.border }}>
-								<h4
-									className="text-sm font-semibold mb-3"
-									style={{ color: theme.text }}>
-									Lifetime Support:
-								</h4>
-								<div className="text-sm" style={{ color: theme.textSecondary }}>
-									<span className="font-medium">$1,000/month</span> ongoing
-								</div>
-								<div
-									className="text-xs mt-1"
-									style={{ color: theme.textSecondary }}>
-									Includes unlimited support, updates & modifications
-								</div>
-							</div>
-
-							<button
-								className="w-full py-3 px-6 rounded-lg font-semibold transition-all duration-300 border-2 hover:shadow-lg"
-								style={{
-									borderColor: theme.primary,
-									color: theme.primary,
-									backgroundColor: "transparent",
-								}}>
-								Contact Sales
-							</button>
-						</div>
+						{packages.map(renderPackageCard)}
 					</div>
 
 					{/* AI Enhancement Call-out */}
